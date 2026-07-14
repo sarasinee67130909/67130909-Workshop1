@@ -139,11 +139,11 @@
         │   │   └── ProductManagePage.jsx
         │   │
         │   └── admin/            # ธีม: Slate (#1E293B) / ไฮไลต์ทอง (#B08D57) / พื้น #F8F9FB
-        │       ├── AdminLoginPage.jsx
-        │       ├── AdminDashboardPage.jsx
-        │       ├── SalesReportPage.jsx
-        │       ├── StockReportPage.jsx
-        │       └── ProfitReportPage.jsx
+        │       ├── AdminLoginPage.jsx      # [Dev2] โครงเดียวกับ StaffLoginPage
+        │       ├── AdminDashboardPage.jsx  # [Dev1] KPI + กราฟยอดขาย + ยอดขายตามช่องทาง
+        │       ├── SalesReportPage.jsx     # [Dev1] ใช้ข้อมูลจากตาราง orders
+        │       ├── StockReportPage.jsx     # [Dev2] ใช้ข้อมูลจากระบบ inventory
+        │       └── ProfitReportPage.jsx    # [Dev2] รายรับ-ต้นทุน-กำไร
         │
         └── styles/
             ├── global.css        # reset + ฟอนต์ + ตัวแปรสีกลาง
@@ -203,14 +203,14 @@ DB_NAME=wibwab_db
 ไฟล์อยู่ที่ `Wibwab-Backend/docker-compose.yml`
 
 - `mysql` — image mysql:8, พอร์ต 3306, volume `mysql_data` (ข้อมูลไม่หายเมื่อ restart), mount `./database` เข้า `/docker-entrypoint-initdb.d` เพื่อรัน schema.sql + seed.sql อัตโนมัติรอบแรก, command กำหนด `--character-set-server=utf8mb4`
-- `phpmyadmin` — พอร์ต 8081 ชี้ไปที่ mysql (เดิมตั้งใจใช้ 8080 แต่ชนกับ phpMyAdmin ของโปรเจค Easy-Check ที่รันค้างไว้ในเครื่อง)
+- `phpmyadmin` — พอร์ต 8080 ชี้ไปที่ mysql
 
 ## 8. คำสั่งรันโปรเจกต์
 
 ```bash
 # 1) ฐานข้อมูล (รันจากในโฟลเดอร์ Backend)
 cd Wibwab-Backend
-docker compose up -d          # MySQL: localhost:3306, phpMyAdmin: localhost:8081
+docker compose up -d          # MySQL: localhost:3306, phpMyAdmin: localhost:8080
 
 # 2) Backend (terminal เดิม)
 npm install && npm run dev    # http://localhost:3000
@@ -227,3 +227,20 @@ npm install && npm run dev    # http://localhost:5173
 3. Backend: staff routes → admin reports
 4. Frontend: api client + AuthContext → หน้า customer → หน้า staff → หน้า admin
 5. ทดสอบด้วย Postman collection ตาม endpoint ในข้อ 3 ของเอกสารนี้
+
+## 10. การแบ่งงานระหว่างผู้พัฒนา (Work Division)
+
+โปรเจกต์นี้พัฒนาโดย 2 คน — **AI Agent ต้องตรวจสอบก่อนว่ากำลังทำงานให้ใคร แล้วแก้ไขเฉพาะไฟล์ในเขตงานของคนนั้น** ห้ามแก้ไฟล์ในเขตงานของอีกคนโดยไม่ได้รับการร้องขอ
+
+| | **Dev1 (เจ้าของ repo)** | **Dev2 (เพื่อนร่วมทีม)** |
+|---|---|---|
+| **Role หลัก** | ลูกค้า (Customer) ทั้ง Frontend + Backend | พนักงาน (Staff) ทั้ง Frontend + Backend |
+| **Backend** | auth (ลูกค้า), products, cart, orders, reviews | staff routes ทั้งหมด (order manage, inventory, product manage) |
+| **Frontend** | `pages/customer/*` ทั้งหมด, `components/product/`, `components/cart/` | `pages/staff/*` ทั้งหมด, `components/dashboard/` |
+| **ส่วน Admin ที่รับผิดชอบ** | AdminDashboardPage, SalesReportPage | AdminLoginPage, StockReportPage, ProfitReportPage |
+| **Admin API ที่รับผิดชอบ** | `GET /api/admin/dashboard`, `GET /api/admin/reports/sales` | `POST /api/admin/login` (ใช้ auth เดิม), `GET /api/admin/reports/stock`, `GET /api/admin/reports/profit` |
+| **ใน report.service.js** | ฟังก์ชันกลุ่ม dashboard + sales | ฟังก์ชันกลุ่ม stock + profit |
+
+**เหตุผลของการแบ่ง:** งาน Admin ของแต่ละคนต่อยอดจากข้อมูลในเขตงานเดิมของตัวเอง — Dev1 ทำระบบสั่งซื้อของลูกค้า จึงรับ Dashboard/Sales ที่อ่านจากตาราง `orders` ส่วน Dev2 ทำระบบ inventory ของพนักงาน จึงรับ Stock/Profit ที่อ่านจากตาราง `product_variants` และ AdminLoginPage ใช้โครงเดียวกับ StaffLoginPage ที่ Dev2 สร้างไว้แล้ว
+
+**ส่วนกลางที่ใช้ร่วมกัน (Shared):** `config/db.js`, `middleware/*`, `utils/*`, `api/client.js`, `AuthContext`, `components/common/*`, `database/schema.sql` — ใครจำเป็นต้องแก้ส่วนกลาง ให้แจ้งอีกคนก่อนทุกครั้ง และไฟล์ `admin.routes.js` / `admin.controller.js` / `report.service.js` เป็นไฟล์ที่สองคนแก้ร่วมกัน — **แยกกันเขียนคนละฟังก์ชันตามตารางข้างบน และ pull ก่อนแก้เสมอ** เพื่อเลี่ยง conflict
