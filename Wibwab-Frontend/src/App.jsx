@@ -1,6 +1,7 @@
 // App.jsx — กำหนด routes ทั้งหมด แยกตาม role
 import { Routes, Route, Link } from 'react-router-dom';
 import HomePage from './pages/customer/HomePage';
+import ProductListPage from './pages/customer/ProductListPage';
 
 // หน้าชั่วคราวสำหรับ route ที่ยังไม่ implement — กันหน้าขาวตอนกดลิงก์ในเมนู
 function ComingSoon() {
@@ -18,7 +19,8 @@ function App() {
     <Routes>
       {/* ── ฝั่งลูกค้า (ธีม Rose Gold) ── */}
       <Route path="/" element={<HomePage />} />
-      {/* TODO: /products, /products/:id, /cart, /checkout, /orders, /login, /register */}
+      <Route path="/products" element={<ProductListPage />} />
+      {/* TODO: /products/:id, /cart, /checkout, /orders, /login, /register */}
 
       {/* ── ฝั่งพนักงาน (ธีม Teal) ── TODO: /staff/* */}
       {/* ── ฝั่งแอดมิน (ธีม Slate) ── TODO: /admin/* */}
