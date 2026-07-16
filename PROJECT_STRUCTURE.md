@@ -203,14 +203,14 @@ DB_NAME=wibwab_db
 ไฟล์อยู่ที่ `Wibwab-Backend/docker-compose.yml`
 
 - `mysql` — image mysql:8, พอร์ต 3306, volume `mysql_data` (ข้อมูลไม่หายเมื่อ restart), mount `./database` เข้า `/docker-entrypoint-initdb.d` เพื่อรัน schema.sql + seed.sql อัตโนมัติรอบแรก, command กำหนด `--character-set-server=utf8mb4`
-- `phpmyadmin` — พอร์ต 8080 ชี้ไปที่ mysql
+- `phpmyadmin` — พอร์ต 8081 ชี้ไปที่ mysql (เดิมตั้งใจใช้ 8080 แต่ชนกับ phpMyAdmin ของโปรเจค Easy-Check ที่รันค้างอยู่ในเครื่อง Dev1)
 
 ## 8. คำสั่งรันโปรเจกต์
 
 ```bash
 # 1) ฐานข้อมูล (รันจากในโฟลเดอร์ Backend)
 cd Wibwab-Backend
-docker compose up -d          # MySQL: localhost:3306, phpMyAdmin: localhost:8080
+docker compose up -d          # MySQL: localhost:3306, phpMyAdmin: localhost:8081
 
 # 2) Backend (terminal เดิม)
 npm install && npm run dev    # http://localhost:3000
