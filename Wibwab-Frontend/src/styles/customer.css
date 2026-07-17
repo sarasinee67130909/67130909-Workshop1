@@ -842,3 +842,648 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   Product Detail Page (PDP)
+   ========================================================================== */
+
+.pdp-page-container {
+  background-color: var(--brand-ivory);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdp-main {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 20px;
+}
+
+.pdp-breadcrumb {
+  display: none;
+  margin-bottom: 32px;
+}
+
+.pdp-breadcrumb ol {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--on-surface-variant);
+}
+
+.pdp-breadcrumb a:hover {
+  color: var(--primary);
+  transition: color 0.2s;
+}
+
+.pdp-breadcrumb li[aria-current='page'] {
+  color: var(--on-surface);
+  font-weight: 600;
+}
+
+.pdp-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* ─── Left: Image Gallery ─── */
+.pdp-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pdp-gallery__main-image-wrapper {
+  position: relative;
+  background-color: var(--brand-blush);
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pdp-gallery__main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.pdp-gallery__main-image-wrapper:hover .pdp-gallery__main-image {
+  transform: scale(1.05);
+}
+
+.pdp-gallery__chip {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  padding: 4px 12px;
+  border: 1px solid var(--brand-rose-light);
+  border-radius: 999px;
+  color: var(--brand-rose);
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pdp-gallery__thumbnails {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.pdp-gallery__thumb {
+  aspect-ratio: 1 / 1;
+  background-color: var(--brand-blush);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  border: 1px solid transparent;
+}
+
+.pdp-gallery__thumb:hover {
+  opacity: 0.8;
+  border-color: var(--brand-rose-light);
+}
+
+.pdp-gallery__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+  mix-blend-mode: multiply;
+}
+
+.pdp-gallery__thumb--video {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(214, 166, 173, 0.5);
+}
+
+.pdp-gallery__thumb--video .material-symbols-outlined {
+  font-size: 32px;
+  color: var(--outline);
+}
+
+/* ─── Right: Product Info ─── */
+.pdp-info {
+  display: flex;
+  flex-direction: column;
+  padding-top: 32px;
+}
+
+.pdp-info__collection {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 8px;
+}
+
+.pdp-info__name {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: var(--on-surface);
+  margin-bottom: 16px;
+}
+
+.pdp-info__description {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--on-surface-variant);
+  margin-bottom: 24px;
+}
+
+.pdp-info__price {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--on-surface);
+  margin-bottom: 32px;
+}
+
+.pdp-info__price-currency {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--on-surface-variant);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.pdp-info__divider {
+  border: none;
+  border-top: 1px solid rgba(214, 166, 173, 0.4);
+  margin-bottom: 32px;
+}
+
+.pdp-variants {
+  margin-bottom: 40px;
+}
+
+.pdp-variants__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.pdp-variants__label {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--on-surface);
+}
+
+.pdp-variants__size-guide {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--brand-rose);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s;
+}
+
+.pdp-variants__size-guide:hover {
+  color: var(--brand-rose-light);
+}
+
+.pdp-variants__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.pdp-variants__option {
+  position: relative;
+  cursor: pointer;
+}
+
+.pdp-variants__option input[type='radio'] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.pdp-variants__option-box {
+  padding: 12px 24px;
+  border: 1px solid var(--brand-rose-light);
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.pdp-variants__option input:hover + .pdp-variants__option-box {
+  border-color: var(--brand-gold);
+}
+
+.pdp-variants__option input:checked + .pdp-variants__option-box {
+  background-color: var(--brand-gold);
+  border-color: var(--brand-gold);
+  color: white;
+}
+
+.pdp-variants__option--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pdp-variants__option--disabled .pdp-variants__option-box {
+  border-color: var(--outline-variant);
+  background-color: #f2dedd; /* surface-container-highest */
+  color: var(--outline);
+  position: relative;
+  overflow: hidden;
+}
+
+.pdp-variants__option--disabled .pdp-variants__option-box:hover {
+  border-color: var(--outline-variant);
+}
+
+.pdp-variants__strike-through {
+  position: absolute;
+  inset: 0;
+  border-bottom: 1px solid var(--outline-variant);
+  transform: rotate(-20deg);
+  transform-origin: bottom left;
+}
+
+/* ─── Responsive ─── */
+@media (min-width: 768px) {
+  .pdp-main {
+    padding: 96px 64px;
+  }
+  .pdp-breadcrumb {
+    display: block;
+  }
+  .pdp-gallery__main-image-wrapper {
+    aspect-ratio: 1 / 1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pdp-layout {
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+  }
+  .pdp-gallery {
+    grid-column: span 7;
+  }
+  .pdp-info {
+    grid-column: span 5;
+    padding-left: 48px;
+    padding-top: 0;
+  }
+}
+
+/* ═══════════ PDP: สถานะโหลด / แถบข้อมูลตัวอย่าง ═══════════ */
+
+.pdp-loading,
+.pdp-notfound {
+  min-height: 40vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--on-surface-variant);
+}
+
+.pdp-notfound a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* แถบเตือนว่ากำลังแสดงข้อมูลตัวอย่าง (ลบเมื่อ Backend เสร็จ) */
+.pdp-mock-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.pdp-mock-banner .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* ═══════════ PDP: แกลเลอรี (thumbnail ที่เลือกอยู่) ═══════════ */
+
+.pdp-gallery__thumb--active {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ═══════════ PDP: ชิป variant แบบมีราคา + สถานะสต็อก ═══════════ */
+
+.pdp-variants__option-box--rich {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 20px;
+}
+
+.pdp-variants__option-price {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.pdp-info__price-prefix {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--on-surface-variant);
+  margin-right: 6px;
+}
+
+.pdp-stock {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+.pdp-stock--in {
+  color: #15803d;
+}
+
+.pdp-stock--low {
+  color: #b45309;
+}
+
+.pdp-stock--out {
+  color: var(--error);
+}
+
+.pdp-variants__material {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 6px;
+}
+
+/* ═══════════ PDP: ปุ่มตะกร้า / ข้อมูลจัดส่ง / Accordion / กล่องช่วยเหลือ ═══════════ */
+
+.pdp-add-to-bag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 32px;
+  border: none;
+  cursor: pointer;
+}
+
+.pdp-add-to-bag:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pdp-add-hint {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 8px;
+  text-align: center;
+}
+
+.pdp-shipping-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 16px;
+}
+
+.pdp-shipping-info .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--primary);
+}
+
+.pdp-accordion-group {
+  margin-top: 32px;
+  border-top: 1px solid var(--outline-variant);
+}
+
+.pdp-accordion-item {
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+/* ซ่อน checkbox แล้วใช้ :checked ควบคุมการกาง (ไม่ต้องใช้ JS) */
+.pdp-accordion-toggle {
+  display: none;
+}
+
+.pdp-accordion-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pdp-accordion-icon {
+  color: var(--on-surface-variant);
+  transition: transform 0.3s;
+}
+
+.pdp-accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.pdp-accordion-content-inner {
+  padding: 0 4px 16px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--on-surface-variant);
+}
+
+.pdp-accordion-toggle:checked ~ .pdp-accordion-content {
+  max-height: 400px;
+}
+
+.pdp-accordion-toggle:checked + .pdp-accordion-label .pdp-accordion-icon {
+  transform: rotate(180deg);
+}
+
+.pdp-assistance-box {
+  display: flex;
+  gap: 14px;
+  margin-top: 32px;
+  padding: 20px;
+  background: var(--brand-blush);
+  border-radius: 8px;
+}
+
+.pdp-assistance-box .material-symbols-outlined {
+  color: var(--primary);
+}
+
+.pdp-assistance-box h4 {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.pdp-assistance-box p {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-bottom: 8px;
+}
+
+.pdp-assistance-box a {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ═══════════ PDP: Modal ตารางไซซ์ ═══════════ */
+
+.pdp-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(35, 25, 25, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.pdp-modal {
+  background: var(--surface);
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.pdp-modal__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.pdp-modal__head h3 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+}
+
+.pdp-modal h4 {
+  font-size: 14px;
+  color: var(--primary);
+  margin: 16px 0 8px;
+}
+
+.pdp-modal table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.pdp-modal th,
+.pdp-modal td {
+  border: 1px solid var(--outline-variant);
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.pdp-modal th {
+  background: var(--surface-variant);
+  font-weight: 600;
+}
+
+.pdp-modal__tip {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 16px;
+}
+
+/* ═══════════ PDP: รีวิวจากลูกค้า ═══════════ */
+
+.pdp-reviews {
+  margin-top: 64px;
+  border-top: 1px solid var(--outline-variant);
+  padding-top: 40px;
+}
+
+.pdp-reviews__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pdp-reviews__head h3 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 26px;
+}
+
+.pdp-reviews__avg {
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.pdp-reviews__empty {
+  color: var(--on-surface-variant);
+  padding: 8px 0 24px;
+}
+
+.pdp-review-card {
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background: #fff;
+}
+
+.pdp-review-card__stars {
+  color: var(--secondary);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.pdp-review-card__meta {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 6px;
+}

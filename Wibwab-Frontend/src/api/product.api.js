@@ -23,3 +23,20 @@ export const getProducts = async (filters = {}) => {
     throw error;
   }
 };
+
+/**
+ * ดึงรายละเอียดสินค้ารายตัว พร้อม variant ทั้งหมดและรีวิว
+ * @param {number|string} id - รหัสสินค้า
+ * คาดหวังรูปแบบ { success: true, data: { id, name, description, category: {id, name},
+ *   images: [path...], variants: [{id, sku, size, color, material, price, stock_qty, low_stock_threshold}],
+ *   reviews: [{id, user_name, rating, comment, created_at}], avg_rating } }
+ */
+export const getProductById = async (id) => {
+  try {
+    const response = await apiClient.get(`/api/products/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching product detail:', error);
+    throw error;
+  }
+};

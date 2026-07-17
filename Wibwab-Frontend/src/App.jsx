@@ -2,6 +2,7 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import HomePage from './pages/customer/HomePage';
 import ProductListPage from './pages/customer/ProductListPage';
+import ProductDetailPage from './pages/customer/ProductDetailPage';
 
 // ── ฝั่งพนักงาน (ธีม Teal) ──
 import StaffLayout from './components/common/StaffLayout';
@@ -28,7 +29,8 @@ function App() {
       {/* ── ฝั่งลูกค้า (ธีม Rose Gold) ── */}
       <Route path="/" element={<HomePage />} />
       <Route path="/products" element={<ProductListPage />} />
-      {/* TODO: /products/:id, /cart, /checkout, /orders, /login, /register */}
+      <Route path="/products/:id" element={<ProductDetailPage />} />
+      {/* TODO: /cart, /checkout, /orders, /login, /register */}
 
       {/* ── ฝั่งพนักงาน (ธีม Teal) ──
           หมายเหตุ: ยังไม่ห่อ ProtectedRoute เพราะ backend/auth ยังไม่เสร็จ

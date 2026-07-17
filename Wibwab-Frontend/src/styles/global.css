@@ -9,17 +9,29 @@
 }
 
 :root {
-  /* ── ธีมลูกค้า: Rose Gold ── */
-  --rose-gold: #b76e79;
-  --rose-gold-dark: #8a4853; /* ใช้กับข้อความ/โลโก้ ให้คอนทราสต์สูงกว่า */
-  --cta-gold: #c9a227;
-  --cta-gold-dark: #b08d22;
-  --bg-cream: #faf6f1;
+  /* ── ธีมหลัก (จากดีไซน์ Stitch) ── */
+  --primary: #8a4853;
+  --on-primary: #ffffff;
+  --secondary: #755b00;
+  --on-secondary: #ffffff;
+  --tertiary: #64595a;
+  --error: #ba1a1a;
+  --background: #fff8f7;
+  --on-background: #231919;
   --surface: #fff8f7;
-  --surface-tint: #f3e3e3; /* พื้นหลังการ์ดรูปสินค้า */
-  --divider: #d7c1c3;
-  --text-main: #231919;
-  --text-muted: #524345;
+  --on-surface: #231919;
+  --surface-variant: #f2dedd;
+  --on-surface-variant: #524345;
+  --outline: #857374;
+  --outline-variant: #d7c1c3;
+
+  /* ── สีแบรนด์ Wibwab (จากดีไซน์ Stitch) ── */
+  --brand-gold: #c9a227;
+  --cta-gold-dark: #b08d22;
+  --brand-rose: #b76e79;
+  --brand-rose-light: #d6a6ad;
+  --brand-ivory: #faf6f1;
+  --brand-blush: #f3e3e3;
 
   /* ── ธีมพนักงาน: Teal ── */
   --staff-teal: #0f766e;
@@ -34,6 +46,16 @@
   /* ── ฟอนต์ (โหลดจาก Google Fonts ใน index.html) ── */
   --font-display: 'Playfair Display', 'Noto Serif Thai', serif;
   --font-body: 'Montserrat', 'Sarabun', sans-serif;
+
+  /* ── ค่าเก่าสำหรับ backward compatibility (จะค่อยๆ ทยอยลบ) ── */
+  --rose-gold: var(--brand-rose);
+  --rose-gold-dark: var(--primary);
+  --cta-gold: var(--brand-gold);
+  --bg-cream: var(--brand-ivory);
+  --surface-tint: var(--brand-blush);
+  --divider: var(--outline-variant);
+  --text-main: var(--on-background);
+  --text-muted: var(--on-surface-variant);
 }
 
 html {
@@ -44,7 +66,7 @@ body {
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
-  color: var(--text-main);
+  color: var(--on-background);
   background: var(--surface);
   -webkit-font-smoothing: antialiased;
 }
