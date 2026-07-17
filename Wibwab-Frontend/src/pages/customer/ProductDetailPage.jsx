@@ -6,6 +6,7 @@ import Footer from '../../components/common/Footer';
 import VariantSelector, { variantLabel } from '../../components/product/VariantSelector';
 import SizeGuideModal from '../../components/product/SizeGuideModal';
 import { getProductById } from '../../api/product.api';
+import { useCart } from '../../context/CartContext';
 import '../../styles/customer.css';
 
 // ── ข้อมูลตัวอย่างไว้พรีวิวหน้า ระหว่าง Backend ยังไม่เสร็จ ──
@@ -60,6 +61,7 @@ const AccordionItem = ({ id, title, children }) => (
 
 export default function ProductDetailPage() {
   const { id } = useParams();
+  const { addItem } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -67,12 +69,14 @@ export default function ProductDetailPage() {
   const [activeImage, setActiveImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
+  const [added, setAdded] = useState(false); // เพิ่งกดเพิ่มลงตะกร้าสำเร็จ
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setActiveImage(0);
     setSelectedVariant(null);
+    setAdded(false);
 
     getProductById(id)
       .then((result) => {
@@ -101,10 +105,16 @@ export default function ProductDetailPage() {
   }, [id]);
 
   const handleAddToBag = () => {
-    // TODO: เชื่อม CartContext เมื่อทำระบบตะกร้า (ขั้นถัดไป)
-    alert(
-      `(เดโม) เพิ่ม "${product.name}" (${variantLabel(selectedVariant)}) ลงตะกร้า\nระบบตะกร้าจริงจะเชื่อมในขั้นถัดไป`
-    );
+    addItem({
+      variantId: selectedVariant.id,
+      productId: product.id,
+      name: product.name,
+      image: product.images[0],
+      variantLabel: variantLabel(selectedVariant),
+      unitPrice: selectedVariant.price,
+      stockQty: selectedVariant.stock_qty,
+    });
+    setAdded(true);
   };
 
   // ── สถานะกำลังโหลด / ไม่พบสินค้า ──
@@ -201,7 +211,10 @@ export default function ProductDetailPage() {
             <VariantSelector
               variants={product.variants}
               selected={selectedVariant}
-              onSelect={setSelectedVariant}
+              onSelect={(variant) => {
+                setSelectedVariant(variant);
+                setAdded(false);
+              }}
               onOpenSizeGuide={() => setShowSizeGuide(true)}
             />
 
@@ -211,6 +224,11 @@ export default function ProductDetailPage() {
             </button>
             {!selectedVariant && (
               <p className="pdp-add-hint">กรุณาเลือกตัวเลือกสินค้าก่อนเพิ่มลงตะกร้า</p>
+            )}
+            {added && (
+              <p className="pdp-added-note">
+                เพิ่มลงตะกร้าแล้ว — <Link to="/cart">ดูตะกร้าสินค้า</Link>
+              </p>
             )}
 
             <p className="pdp-shipping-info">

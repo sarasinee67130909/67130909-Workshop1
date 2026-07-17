@@ -1,6 +1,7 @@
-// components/common/Navbar.jsx — แถบนำทางหลักฝั่งลูกค้า (sticky + เมนูมือถือแบบพับ)
+// components/common/Navbar.jsx — แถบนำทางหลักฝั่งลูกค้า (sticky + เมนูมือถือแบบพับ + badge ตะกร้า)
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 
 // เมนูหมวดหมู่ — ค่า category ตรงกับ id ในตาราง categories (seed.sql)
 const NAV_LINKS = [
@@ -14,6 +15,7 @@ const NAV_LINKS = [
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { itemCount } = useCart();
 
   return (
     <header className="navbar">
@@ -54,8 +56,9 @@ function Navbar() {
           <Link to="/products" aria-label="ค้นหาสินค้า">
             <span className="material-symbols-outlined">search</span>
           </Link>
-          <Link to="/cart" aria-label="ตะกร้าสินค้า">
+          <Link to="/cart" aria-label="ตะกร้าสินค้า" className="navbar-cart">
             <span className="material-symbols-outlined">shopping_bag</span>
+            {itemCount > 0 && <span className="navbar-cart__badge">{itemCount}</span>}
           </Link>
           <Link to="/login" aria-label="เข้าสู่ระบบ">
             <span className="material-symbols-outlined">person</span>

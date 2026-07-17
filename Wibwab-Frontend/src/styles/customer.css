@@ -1487,3 +1487,296 @@
   color: var(--on-surface-variant);
   margin-top: 6px;
 }
+
+/* ข้อความยืนยันหลังเพิ่มลงตะกร้า (หน้า ProductDetail) */
+.pdp-added-note {
+  font-size: 14px;
+  color: #15803d;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.pdp-added-note a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ═══════════ Navbar: badge จำนวนสินค้าบนไอคอนตะกร้า ═══════════ */
+
+.navbar-cart {
+  position: relative;
+}
+
+.navbar-cart__badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ═══════════ Cart: หน้าตะกร้าสินค้า ═══════════ */
+
+.cart-page {
+  width: 100%;
+  max-width: 1280px;
+  margin: 40px auto;
+  padding: 0 24px;
+  flex: 1;
+}
+
+.cart-page__title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 32px;
+  margin-bottom: 32px;
+}
+
+.cart-page__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .cart-page__layout {
+    grid-template-columns: 1fr 360px;
+  }
+}
+
+.cart-page__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 80px 0;
+  color: var(--on-surface-variant);
+}
+
+.cart-page__empty .material-symbols-outlined {
+  font-size: 64px;
+  color: var(--brand-rose-light);
+}
+
+/* แถวสินค้าในตะกร้า */
+.cart-item {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 16px;
+}
+
+.cart-item__image {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--brand-blush);
+}
+
+.cart-item__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-item__name {
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.cart-item__name:hover {
+  color: var(--primary);
+}
+
+.cart-item__variant,
+.cart-item__unit-price {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 2px;
+}
+
+/* ปุ่มปรับจำนวน −/+ */
+.cart-item__qty {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.cart-item__qty button {
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+.cart-item__qty button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.cart-item__qty span {
+  min-width: 36px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cart-item__stock-note {
+  font-size: 12px;
+  color: #b45309;
+  margin-top: 6px;
+}
+
+.cart-item__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.cart-item__line-total {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.cart-item__remove {
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.cart-item__remove:hover {
+  color: var(--error);
+}
+
+/* การ์ดสรุปคำสั่งซื้อ */
+.order-summary {
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: #fff;
+  padding: 24px;
+  position: sticky;
+  top: 112px;
+}
+
+.order-summary h3 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.order-summary__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+.order-summary__row--discount {
+  color: #15803d;
+}
+
+.order-summary__row--total {
+  border-top: 1px solid var(--outline-variant);
+  margin-top: 8px;
+  padding-top: 14px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.order-summary__checkout {
+  display: block;
+  text-align: center;
+  width: 100%;
+  margin-top: 16px;
+}
+
+/* กล่องโค้ดส่วนลด */
+.promo-box {
+  margin-bottom: 16px;
+}
+
+.promo-box__row {
+  display: flex;
+  gap: 8px;
+}
+
+.promo-box__row input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.promo-box__apply {
+  padding: 10px 16px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.promo-box__msg {
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.promo-box__msg--ok {
+  color: #15803d;
+}
+
+.promo-box__msg--err {
+  color: var(--error);
+}
+
+.promo-box--applied {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.promo-box--applied .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.promo-box--applied button {
+  margin-left: auto;
+  color: var(--error);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
