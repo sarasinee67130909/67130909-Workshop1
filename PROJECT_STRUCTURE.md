@@ -57,7 +57,7 @@
 │   │   │   └── errorHandler.js   # error handler กลาง (ตอบ JSON format เดียวกัน)
 │   │   │
 │   │   ├── routes/               # ประกาศ endpoint เท่านั้น — logic อยู่ใน controllers
-│   │   │   ├── auth.routes.js        # POST /api/auth/register, /login
+│   │   │   ├── auth.routes.js        # POST /api/auth/register, /login, /forgot-password, /reset-password
 │   │   │   ├── product.routes.js     # GET /api/products, /api/products/:id
 │   │   │   ├── cart.routes.js        # GET/POST/PUT/DELETE /api/cart
 │   │   │   ├── order.routes.js       # POST /api/orders, GET /api/orders/my, แนบสลิป
@@ -129,7 +129,9 @@
         │   │   ├── CheckoutPage.jsx
         │   │   ├── OrderHistoryPage.jsx
         │   │   ├── LoginPage.jsx
-        │   │   └── RegisterPage.jsx
+        │   │   ├── RegisterPage.jsx
+        │   │   ├── ForgotPasswordPage.jsx  # ขอรีเซ็ต (กรอกอีเมล) + สถานะส่งลิงก์แล้ว
+        │   │   └── ResetPasswordPage.jsx   # ตั้งรหัสใหม่จากลิงก์ (มี token ใน URL)
         │   │
         │   ├── staff/            # ธีม: Teal (#0F766E) / sidebar #134E4A / พื้น #F6F8F8
         │   │   ├── StaffLoginPage.jsx
@@ -138,12 +140,12 @@
         │   │   ├── InventoryPage.jsx
         │   │   └── ProductManagePage.jsx
         │   │
-        │   └── admin/            # ธีม: Slate (#1E293B) / ไฮไลต์ทอง (#B08D57) / พื้น #F8F9FB
-        │       ├── AdminLoginPage.jsx      # [Dev2] โครงเดียวกับ StaffLoginPage
-        │       ├── AdminDashboardPage.jsx  # [Dev1] KPI + กราฟยอดขาย + ยอดขายตามช่องทาง
-        │       ├── SalesReportPage.jsx     # [Dev1] ใช้ข้อมูลจากตาราง orders
-        │       ├── StockReportPage.jsx     # [Dev2] ใช้ข้อมูลจากระบบ inventory
-        │       └── ProfitReportPage.jsx    # [Dev2] รายรับ-ต้นทุน-กำไร
+        │   └── admin/            # ธีม: Slate (#1E293B) / ไฮไลต์ทอง (#B08D57) / พื้น #F8F9FB — [Dev2] ทั้งโฟลเดอร์
+        │       ├── AdminLoginPage.jsx      # โครงเดียวกับ StaffLoginPage
+        │       ├── AdminDashboardPage.jsx  # KPI + กราฟยอดขาย + ยอดขายตามช่องทาง
+        │       ├── SalesReportPage.jsx     # ใช้ข้อมูลจากตาราง orders
+        │       ├── StockReportPage.jsx     # ใช้ข้อมูลจากระบบ inventory
+        │       └── ProfitReportPage.jsx    # รายรับ-ต้นทุน-กำไร
         │
         └── styles/
             ├── global.css        # reset + ฟอนต์ + ตัวแปรสีกลาง
@@ -157,6 +159,7 @@
 | ตาราง | เก็บอะไร | หมายเหตุ |
 |---|---|---|
 | `users` | ผู้ใช้ทุกคน | คอลัมน์ `role` ENUM('customer','staff','admin') |
+| `password_resets` | token รีเซ็ตรหัสผ่าน | token, user_id, expires_at (30 นาที), used (boolean) |
 | `addresses` | ที่อยู่จัดส่งของลูกค้า | 1 user มีได้หลายที่อยู่ |
 | `categories` | หมวดหมู่ (แหวน สร้อย ต่างหู กำไล) | |
 | `products` | ข้อมูลสินค้าหลัก | ชื่อ, คำอธิบาย, หมวด, สถานะแสดง/ซ่อน |
@@ -182,6 +185,7 @@
 8. **สีของแต่ละ role** ใช้ตามที่ระบุใน comment ของโฟลเดอร์ pages (ธีม Rose Gold / Teal / Slate+Gold)
 9. คอมเมนต์ในโค้ดเขียนเป็นภาษาไทยได้ เพื่อให้ผู้จัดทำอ่านทบทวนและอธิบายต่ออาจารย์ได้
 10. ยังไม่ต้องทำ: payment gateway จริง, ส่งอีเมล/SMS จริง, ระบบคืนสินค้า, สะสมแต้ม (อยู่นอกขอบเขต)
+11. **ลืมรหัสผ่าน**: ทำระบบ token จริง (ตาราง `password_resets` — token สุ่ม, หมดอายุ 30 นาที, ใช้ได้ครั้งเดียว) แต่**จำลองการส่งอีเมล**: response ของ `/api/auth/forgot-password` ส่งลิงก์รีเซ็ตกลับมาให้แสดงบนหน้าจอ/console แทนการส่งอีเมลจริง
 
 ## 6. Environment Variables (.env.example)
 
@@ -203,14 +207,14 @@ DB_NAME=wibwab_db
 ไฟล์อยู่ที่ `Wibwab-Backend/docker-compose.yml`
 
 - `mysql` — image mysql:8, พอร์ต 3306, volume `mysql_data` (ข้อมูลไม่หายเมื่อ restart), mount `./database` เข้า `/docker-entrypoint-initdb.d` เพื่อรัน schema.sql + seed.sql อัตโนมัติรอบแรก, command กำหนด `--character-set-server=utf8mb4`
-- `phpmyadmin` — พอร์ต 8081 ชี้ไปที่ mysql (เดิมตั้งใจใช้ 8080 แต่ชนกับ phpMyAdmin ของโปรเจค Easy-Check ที่รันค้างอยู่ในเครื่อง Dev1)
+- `phpmyadmin` — พอร์ต 8080 ชี้ไปที่ mysql
 
 ## 8. คำสั่งรันโปรเจกต์
 
 ```bash
 # 1) ฐานข้อมูล (รันจากในโฟลเดอร์ Backend)
 cd Wibwab-Backend
-docker compose up -d          # MySQL: localhost:3306, phpMyAdmin: localhost:8081
+docker compose up -d          # MySQL: localhost:3306, phpMyAdmin: localhost:8080
 
 # 2) Backend (terminal เดิม)
 npm install && npm run dev    # http://localhost:3000
@@ -234,13 +238,13 @@ npm install && npm run dev    # http://localhost:5173
 
 | | **Dev1 (เจ้าของ repo)** | **Dev2 (เพื่อนร่วมทีม)** |
 |---|---|---|
-| **Role หลัก** | ลูกค้า (Customer) ทั้ง Frontend + Backend | พนักงาน (Staff) ทั้ง Frontend + Backend |
-| **Backend** | auth (ลูกค้า), products, cart, orders, reviews | staff routes ทั้งหมด (order manage, inventory, product manage) |
-| **Frontend** | `pages/customer/*` ทั้งหมด, `components/product/`, `components/cart/` | `pages/staff/*` ทั้งหมด, `components/dashboard/` |
-| **ส่วน Admin ที่รับผิดชอบ** | AdminDashboardPage, SalesReportPage | AdminLoginPage, StockReportPage, ProfitReportPage |
-| **Admin API ที่รับผิดชอบ** | `GET /api/admin/dashboard`, `GET /api/admin/reports/sales` | `POST /api/admin/login` (ใช้ auth เดิม), `GET /api/admin/reports/stock`, `GET /api/admin/reports/profit` |
-| **ใน report.service.js** | ฟังก์ชันกลุ่ม dashboard + sales | ฟังก์ชันกลุ่ม stock + profit |
+| **Role หลัก** | ลูกค้า (Customer) ทั้ง Frontend + Backend | พนักงาน (Staff) + แอดมิน (Admin) ทั้ง Frontend + Backend |
+| **Backend** | auth (สมัคร/ล็อกอิน/ลืมรหัสผ่าน), products, cart, orders, reviews | staff routes ทั้งหมด (order manage, inventory, product manage) + admin routes ทั้งหมด (dashboard, รายงานทุกตัว) |
+| **Frontend** | `pages/customer/*` ทั้งหมด, `components/product/`, `components/cart/` | `pages/staff/*` และ `pages/admin/*` ทั้งหมด, `components/dashboard/` |
+| **ไฟล์ Admin ที่รับผิดชอบ** | — (ไม่มี) | `admin.routes.js`, `admin.controller.js`, `report.service.js` และทุกหน้าใน `pages/admin/` |
 
-**เหตุผลของการแบ่ง:** งาน Admin ของแต่ละคนต่อยอดจากข้อมูลในเขตงานเดิมของตัวเอง — Dev1 ทำระบบสั่งซื้อของลูกค้า จึงรับ Dashboard/Sales ที่อ่านจากตาราง `orders` ส่วน Dev2 ทำระบบ inventory ของพนักงาน จึงรับ Stock/Profit ที่อ่านจากตาราง `product_variants` และ AdminLoginPage ใช้โครงเดียวกับ StaffLoginPage ที่ Dev2 สร้างไว้แล้ว
+**เหตุผลของการแบ่ง:** Dev2 รับฝั่งหลังบ้านทั้งหมด (Staff + Admin) เพราะสองส่วนนี้ใช้โครง UI แบบ dashboard เหมือนกันและใช้ `components/dashboard/` ร่วมกัน ส่วน Dev1 รับฝั่งลูกค้าทั้งหมดซึ่งมีจำนวนหน้ามากกว่าและรวมระบบ auth กลาง (สมัคร/ล็อกอิน/ลืมรหัสผ่าน) ที่ทุก Role ใช้ต่อ — ปริมาณงานโดยรวมจึงใกล้เคียงกัน
 
-**ส่วนกลางที่ใช้ร่วมกัน (Shared):** `config/db.js`, `middleware/*`, `utils/*`, `api/client.js`, `AuthContext`, `components/common/*`, `database/schema.sql` — ใครจำเป็นต้องแก้ส่วนกลาง ให้แจ้งอีกคนก่อนทุกครั้ง และไฟล์ `admin.routes.js` / `admin.controller.js` / `report.service.js` เป็นไฟล์ที่สองคนแก้ร่วมกัน — **แยกกันเขียนคนละฟังก์ชันตามตารางข้างบน และ pull ก่อนแก้เสมอ** เพื่อเลี่ยง conflict
+**หมายเหตุสำหรับ Dev2:** รายงานฝั่ง Admin ต้องอ่านข้อมูลจากตาราง `orders` ที่ Dev1 เป็นคนสร้าง — ให้ยึดโครงสร้างตารางตามข้อ 4 ของเอกสารนี้ ถ้าจำเป็นต้องเพิ่มคอลัมน์ ให้ตกลงกับ Dev1 ก่อน
+
+**ส่วนกลางที่ใช้ร่วมกัน (Shared):** `config/db.js`, `middleware/*`, `utils/*`, `api/client.js`, `AuthContext`, `components/common/*`, `database/schema.sql` — ใครจำเป็นต้องแก้ส่วนกลาง ให้แจ้งอีกคนก่อนทุกครั้ง และ **pull ก่อนเริ่มงานเสมอ** เพื่อเลี่ยง conflict
