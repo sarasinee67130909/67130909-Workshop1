@@ -57,6 +57,8 @@ function App() {
         <Route path="orders" element={<OrderManagePage />} />
         <Route path="inventory" element={<InventoryPage />} />
         <Route path="products" element={<ProductManagePage />} />
+        <Route path="products/new" element={<ProductManagePage />} />
+        <Route path="products/:id" element={<ProductManagePage />} />
       </Route>
 
       {/* ── ฝั่งแอดมิน (ธีม Slate) ── TODO: /admin/* */}

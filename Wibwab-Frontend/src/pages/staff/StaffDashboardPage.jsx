@@ -1,42 +1,52 @@
 import StatCard from '../../components/dashboard/StatCard';
 import StatusBadge from '../../components/dashboard/StatusBadge';
-// TODO: import { getStaffDashboard } from '../../api/staff.api';
+import { getStaffDashboard } from '../../api/staff.api';
 import { useEffect, useState } from 'react';
 
-// Mock data — แทนที่ด้วยผลลัพธ์จาก GET /api/staff/dashboard เมื่อ backend พร้อม
-const MOCK_KPIS = [
-  { icon: 'payments', label: 'ยอดขายรวม', value: '$45,200.00', trend: '+12%' },
-  { icon: 'pending_actions', label: 'คำสั่งซื้อรอดำเนินการ', value: '28' },
-  { icon: 'group_add', label: 'ลูกค้าใหม่', value: '156', trend: '+5%' },
-  { icon: 'warning', label: 'สินค้าหมดสต็อก', value: '4', iconTone: 'error' },
-];
+function formatCurrency(n) {
+  return `฿${Number(n || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
 
-const MOCK_RECENT_ORDERS = [
-  { id: '#ORD-9081', customer: 'Eleanor Vance', date: 'Oct 24, 2023', total: '$1,250.00', status: 'processing' },
-  { id: '#ORD-9080', customer: 'Arthur Pendelton', date: 'Oct 24, 2023', total: '$4,500.00', status: 'shipped' },
-  { id: '#ORD-9079', customer: 'Sarah Jenkins', date: 'Oct 23, 2023', total: '$850.00', status: 'delivered' },
-  { id: '#ORD-9078', customer: 'Marcus Thorne', date: 'Oct 23, 2023', total: '$12,000.00', status: 'delivered' },
-  { id: '#ORD-9077', customer: 'Lydia Bennett', date: 'Oct 22, 2023', total: '$320.00', status: 'processing' },
-];
-
-const MOCK_TOP_PRODUCTS = [
-  { name: 'Classic Diamond Solitaire', category: 'Rings', sku: 'RNG-001', sold: 42 },
-  { name: 'Sapphire Teardrop Pendant', category: 'Necklaces', sku: 'NCK-042', sold: 38 },
-  { name: 'Pavé Diamond Hoops', category: 'Earrings', sku: 'ERR-112', sold: 24 },
-  { name: 'Chronograph Steel Watch', category: 'Watches', sku: 'WTC-008', sold: 15 },
-];
+function formatDate(iso) {
+  if (!iso) return '-';
+  return new Date(iso).toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric' });
+}
 
 export default function StaffDashboardPage() {
-  const [kpis, setKpis] = useState(MOCK_KPIS);
-  const [recentOrders, setRecentOrders] = useState(MOCK_RECENT_ORDERS);
-  const [topProducts, setTopProducts] = useState(MOCK_TOP_PRODUCTS);
+  const [kpis, setKpis] = useState([]);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // getStaffDashboard().then((res) => {
-    //   setKpis(res.data.kpis);
-    //   setRecentOrders(res.data.recentOrders);
-    //   setTopProducts(res.data.topProducts);
-    // });
+    let active = true;
+    setLoading(true);
+    getStaffDashboard()
+      .then((res) => {
+        if (!active || !res.success) return;
+        const k = res.data.kpis;
+        setKpis([
+          { icon: 'payments', label: 'ยอดขายรวม', value: formatCurrency(k.total_sales) },
+          { icon: 'pending_actions', label: 'คำสั่งซื้อรอดำเนินการ', value: String(k.pending_orders) },
+          { icon: 'group_add', label: 'ลูกค้าใหม่ (30 วัน)', value: String(k.new_customers_30d) },
+          {
+            icon: 'warning',
+            label: 'สินค้าหมดสต็อก',
+            value: String(k.out_of_stock_variants),
+            iconTone: k.out_of_stock_variants > 0 ? 'error' : 'primary',
+          },
+        ]);
+        setRecentOrders(res.data.recentOrders);
+        setTopProducts(res.data.topProducts);
+      })
+      .catch((err) => {
+        if (active) setError(err.response?.data?.message || 'โหลดข้อมูลแดชบอร์ดไม่สำเร็จ');
+      })
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
@@ -46,15 +56,13 @@ export default function StaffDashboardPage() {
           <h1>แดชบอร์ด</h1>
           <p>ภาพรวมการดำเนินงานวันนี้</p>
         </div>
-        <div className="staff-page-header__actions">
-          <button className="staff-btn staff-btn--secondary">ส่งออกรายงาน</button>
-          <button className="staff-btn staff-btn--primary">สร้างคำสั่งซื้อใหม่</button>
-        </div>
       </div>
 
+      {error && <p className="staff-login__error">{error}</p>}
+
       <div className="staff-kpi-grid">
-        {kpis.map((kpi) => (
-          <StatCard key={kpi.label} {...kpi} />
+        {(loading ? Array.from({ length: 4 }) : kpis).map((kpi, i) => (
+          <StatCard key={kpi?.label || i} {...(kpi || { icon: 'hourglass_empty', label: 'กำลังโหลด...', value: '—' })} />
         ))}
       </div>
 
@@ -63,7 +71,6 @@ export default function StaffDashboardPage() {
         <div className="staff-card">
           <div className="staff-card__header">
             <h3>คำสั่งซื้อล่าสุด</h3>
-            <button className="staff-card__link">ดูทั้งหมด</button>
           </div>
           <div className="staff-table-wrap">
             <table className="staff-table">
@@ -77,12 +84,19 @@ export default function StaffDashboardPage() {
                 </tr>
               </thead>
               <tbody>
+                {!loading && recentOrders.length === 0 && (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: 'center', color: 'var(--staff-text-muted)' }}>
+                      ยังไม่มีคำสั่งซื้อ
+                    </td>
+                  </tr>
+                )}
                 {recentOrders.map((order) => (
                   <tr key={order.id} className="is-row">
-                    <td className="mono">{order.id}</td>
+                    <td className="mono">#ORD-{String(order.id).padStart(4, '0')}</td>
                     <td>{order.customer}</td>
-                    <td>{order.date}</td>
-                    <td className="mono">{order.total}</td>
+                    <td>{formatDate(order.created_at)}</td>
+                    <td className="mono">{formatCurrency(order.total_amount)}</td>
                     <td>
                       <StatusBadge status={order.status} />
                     </td>
@@ -97,11 +111,11 @@ export default function StaffDashboardPage() {
         <div className="staff-card" style={{ display: 'flex', flexDirection: 'column' }}>
           <div className="staff-card__header">
             <h3>สินค้าขายดี</h3>
-            <button className="staff-icon-btn" aria-label="เพิ่มเติม">
-              <span className="material-symbols-outlined">more_vert</span>
-            </button>
           </div>
           <div className="staff-card__body" style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
+            {!loading && topProducts.length === 0 && (
+              <p style={{ color: 'var(--staff-text-muted)', fontSize: 13 }}>ยังไม่มีข้อมูลยอดขาย</p>
+            )}
             {topProducts.map((p) => (
               <div key={p.sku} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div className="staff-table__thumb-placeholder" style={{ width: 40, height: 40 }}>
@@ -116,11 +130,6 @@ export default function StaffDashboardPage() {
                 <div className="mono" style={{ fontSize: 13, whiteSpace: 'nowrap' }}>ขายแล้ว {p.sold}</div>
               </div>
             ))}
-          </div>
-          <div style={{ padding: 16, paddingTop: 0 }}>
-            <button className="staff-btn staff-btn--ghost" style={{ width: '100%', justifyContent: 'center' }}>
-              ดูรายงานคลังสินค้า
-            </button>
           </div>
         </div>
       </div>
