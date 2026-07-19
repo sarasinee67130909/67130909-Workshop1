@@ -7,6 +7,7 @@ import CartPage from './pages/customer/CartPage';
 import CheckoutPage from './pages/customer/CheckoutPage';
 import OrderHistoryPage from './pages/customer/OrderHistoryPage';
 import LoginPage from './pages/customer/LoginPage';
+import RegisterPage from './pages/customer/RegisterPage';
 
 // ── ฝั่งพนักงาน (ธีม Teal) ──
 import StaffLayout from './components/common/StaffLayout';
@@ -38,7 +39,7 @@ function App() {
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/orders" element={<OrderHistoryPage />} />
       <Route path="/login" element={<LoginPage />} />
-      {/* TODO: /register */}
+      <Route path="/register" element={<RegisterPage />} />
 
       {/* ── ฝั่งพนักงาน (ธีม Teal) ──
           หมายเหตุ: ยังไม่ห่อ ProtectedRoute เพราะ backend/auth ยังไม่เสร็จ

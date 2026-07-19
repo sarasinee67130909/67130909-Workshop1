@@ -1526,6 +1526,45 @@
   justify-content: center;
 }
 
+/* สถานะล็อกอินบน Navbar: ชื่อผู้ใช้ (ลิงก์ไปประวัติสั่งซื้อ) + ปุ่มออกจากระบบ */
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navbar-user__name {
+  display: none;
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .navbar-user__name {
+    display: inline;
+  }
+}
+
+.navbar-logout {
+  display: flex;
+  color: var(--rose-gold-dark);
+  cursor: pointer;
+  transition: opacity 0.3s, transform 0.1s;
+}
+
+.navbar-logout:hover {
+  opacity: 0.8;
+  color: var(--error);
+}
+
+.navbar-logout:active {
+  transform: scale(0.95);
+}
+
 /* ═══════════ Cart: หน้าตะกร้าสินค้า ═══════════ */
 
 .cart-page {
@@ -2623,4 +2662,109 @@
   .login-header {
     text-align: left;
   }
+}
+
+/* ==========================================================================
+   Register Page (register-*)
+   ========================================================================== */
+
+/* ใช้ layout, form-wrapper, header, input-group, password-wrapper, error-msg, register-link
+   ร่วมกับหน้า Login (login-*) เพื่อความสอดคล้อง */
+
+.register-submit-btn {
+  width: 100%;
+  background-color: var(--brand-rose); /* สีปุ่มตาม spec */
+  color: var(--on-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 16px 24px;
+  transition: background-color 0.3s, opacity 0.2s;
+}
+
+.register-submit-btn:hover {
+  background-color: var(--primary); /* hover สีเข้มขึ้น */
+}
+
+.register-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--brand-rose); /* สีตอน disabled ไม่ต้องเปลี่ยน */
+}
+
+.register-terms {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.register-terms label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.register-terms a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  margin: 0 4px;
+}
+
+/* สไตล์สำหรับ field ที่มี error */
+.register-field--error label {
+  color: var(--error);
+}
+.register-field--error .minimal-input {
+  border-bottom-color: var(--error);
+}
+.register-field__error-msg {
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 4px;
+}
+
+/* แต่ง <select> ให้เหมือน <input> */
+.register-select-wrapper {
+  position: relative;
+}
+.register-select-wrapper::after {
+  content: 'expand_more';
+  font-family: 'Material Symbols Outlined';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--on-surface-variant);
+}
+.register-select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 24px; /* กันที่ให้ลูกศร */
+}
+
+/* แถวเลือกไซซ์ 2 ช่องคู่กัน (แหวน + กำไล) ตามดีไซน์ */
+.register-size-hint {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin: 4px 0 12px;
+}
+
+.register-size-row {
+  display: flex;
+  gap: 16px;
+}
+
+.register-size-col {
+  width: 50%;
+}
+
+.register-size-col label {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  margin-bottom: 4px;
 }

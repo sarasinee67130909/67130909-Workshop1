@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { login as apiLogin } from '../api/auth.api';
+import { login as apiLogin, register as apiRegister } from '../api/auth.api';
 
 const AuthContext = createContext(null);
 
@@ -34,6 +34,19 @@ export function AuthProvider({ children }) {
     return response; // ส่ง response กลับไปให้ component จัดการ (error/success)
   };
 
+  const register = async (userData) => {
+    const response = await apiRegister(userData);
+    if (response.success) {
+      const { token: apiToken, user: apiUser } = response.data;
+      // สมัครสมาชิกสำเร็จ = ล็อกอินให้เลย
+      localStorage.setItem('token', apiToken);
+      localStorage.setItem('user', JSON.stringify(apiUser));
+      setToken(apiToken);
+      setUser(apiUser);
+    }
+    return response;
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -46,6 +59,7 @@ export function AuthProvider({ children }) {
     token,
     isLoggedIn: !!token,
     login,
+    register,
     logout,
   };
 

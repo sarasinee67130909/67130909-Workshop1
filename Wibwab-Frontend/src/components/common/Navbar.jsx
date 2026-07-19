@@ -1,7 +1,8 @@
-// components/common/Navbar.jsx — แถบนำทางหลักฝั่งลูกค้า (sticky + เมนูมือถือแบบพับ + badge ตะกร้า)
+// components/common/Navbar.jsx — แถบนำทางหลักฝั่งลูกค้า (sticky + เมนูมือถือ + badge ตะกร้า + สถานะล็อกอิน)
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 
 // เมนูหมวดหมู่ — ค่า category ตรงกับ id ในตาราง categories (seed.sql)
 const NAV_LINKS = [
@@ -16,6 +17,7 @@ const NAV_LINKS = [
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { itemCount } = useCart();
+  const { isLoggedIn, user, logout } = useAuth();
 
   return (
     <header className="navbar">
@@ -60,9 +62,28 @@ function Navbar() {
             <span className="material-symbols-outlined">shopping_bag</span>
             {itemCount > 0 && <span className="navbar-cart__badge">{itemCount}</span>}
           </Link>
-          <Link to="/login" aria-label="เข้าสู่ระบบ">
-            <span className="material-symbols-outlined">person</span>
-          </Link>
+          {isLoggedIn ? (
+            <>
+              {/* ล็อกอินแล้ว: ไอคอนคน → ประวัติการสั่งซื้อ + ปุ่มออกจากระบบ */}
+              <Link to="/orders" aria-label="คำสั่งซื้อของฉัน" className="navbar-user" title={user?.full_name}>
+                <span className="material-symbols-outlined">person</span>
+                <span className="navbar-user__name">{user?.full_name?.split(' ')[0]}</span>
+              </Link>
+              <button
+                type="button"
+                className="navbar-logout"
+                aria-label="ออกจากระบบ"
+                title="ออกจากระบบ"
+                onClick={logout}
+              >
+                <span className="material-symbols-outlined">logout</span>
+              </button>
+            </>
+          ) : (
+            <Link to="/login" aria-label="เข้าสู่ระบบ">
+              <span className="material-symbols-outlined">person</span>
+            </Link>
+          )}
         </div>
       </div>
 
