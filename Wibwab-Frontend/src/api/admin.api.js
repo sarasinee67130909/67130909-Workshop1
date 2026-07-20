@@ -67,6 +67,11 @@ async function downloadReport(url, params, format) {
   window.URL.revokeObjectURL(blobUrl);
 }
 
+// { range: '7d' | '30d', format: 'xlsx' | 'pdf' }
+export function exportAdminDashboard({ range = '7d', format = 'xlsx' } = {}) {
+  return downloadReport('/api/admin/dashboard/export', { range }, format);
+}
+
 // { from, to, category, format: 'xlsx' | 'pdf' }
 export function exportSalesReport({ from, to, category, format = 'xlsx' } = {}) {
   return downloadReport('/api/admin/reports/sales/export', { from, to, category }, format);

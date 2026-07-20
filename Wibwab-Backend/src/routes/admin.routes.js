@@ -9,6 +9,7 @@ router.use(verifyToken, requireRole('admin'));
 
 // ── Dashboard ──
 router.get('/dashboard', adminController.dashboard);
+router.get('/dashboard/export', adminController.dashboardExport);
 
 // ── รายงาน ──
 router.get('/reports/sales', adminController.salesReport);

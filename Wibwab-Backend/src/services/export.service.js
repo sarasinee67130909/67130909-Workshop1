@@ -95,6 +95,48 @@ function addTableSheet(workbook, sheetName, title, subtitle, columns, rows) {
   return sheet;
 }
 
+async function buildDashboardExcel(data) {
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = BRAND_NAME;
+  workbook.created = new Date();
+
+  addKpiSheet(workbook, [
+    ['ช่วงเวลา', data.range === '30d' ? '30 วันล่าสุด' : '7 วันล่าสุด'],
+    ['ยอดขายวันนี้', formatCurrency(data.kpis.sales_today)],
+    ['รายได้เดือนนี้', formatCurrency(data.kpis.revenue_this_month)],
+    ['คำสั่งซื้อทั้งหมด', data.kpis.total_orders],
+    ['ลูกค้าใหม่ (30 วัน)', data.kpis.new_customers_30d],
+  ]);
+
+  addTableSheet(
+    workbook,
+    'ยอดขายรายวัน',
+    'ยอดขายรายวัน',
+    data.range === '30d' ? '30 วันล่าสุด' : '7 วันล่าสุด',
+    [
+      { key: 'date', header: 'วันที่', width: 16 },
+      { key: 'total', header: 'ยอดขาย (บาท)', width: 20, align: 'right', numFmt: '#,##0' },
+    ],
+    data.dailySales
+  );
+
+  addTableSheet(
+    workbook,
+    'สินค้าขายดี',
+    'สินค้าขายดี (5 อันดับแรก)',
+    formatDateThai(),
+    [
+      { key: 'name', header: 'สินค้า', width: 26 },
+      { key: 'category', header: 'หมวดหมู่', width: 20 },
+      { key: 'sold', header: 'จำนวนที่ขาย', width: 16, align: 'right', numFmt: '#,##0' },
+      { key: 'revenue', header: 'รายได้ (บาท)', width: 18, align: 'right', numFmt: '#,##0' },
+    ],
+    data.topProducts
+  );
+
+  return workbook.xlsx.writeBuffer();
+}
+
 async function buildSalesExcel(data) {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = BRAND_NAME;
@@ -350,6 +392,43 @@ function pdfBufferFromDoc(doc) {
   });
 }
 
+async function buildDashboardPdf(data) {
+  const doc = newPdfDoc();
+  const rangeLabel = data.range === '30d' ? '30 วันล่าสุด' : '7 วันล่าสุด';
+  pdfHeader(doc, 'ภาพรวม', `ช่วงเวลา ${rangeLabel} · ส่งออกเมื่อ ${formatDateThai()}`);
+
+  pdfKpiGrid(doc, [
+    ['ยอดขายวันนี้', formatCurrency(data.kpis.sales_today)],
+    ['รายได้เดือนนี้', formatCurrency(data.kpis.revenue_this_month)],
+    ['คำสั่งซื้อทั้งหมด', data.kpis.total_orders.toLocaleString('th-TH')],
+    ['ลูกค้าใหม่ (30 วัน)', data.kpis.new_customers_30d.toLocaleString('th-TH')],
+  ]);
+
+  pdfTable(
+    doc,
+    'สินค้าขายดี',
+    [
+      { key: 'name', header: 'สินค้า', weight: 3 },
+      { key: 'category', header: 'หมวดหมู่', weight: 2 },
+      { key: 'sold', header: 'จำนวนที่ขาย', weight: 2, align: 'right' },
+      { key: 'revenue', header: 'รายได้', weight: 2, align: 'right', format: formatCurrency },
+    ],
+    data.topProducts
+  );
+
+  pdfTable(
+    doc,
+    `ยอดขายรายวัน (${rangeLabel})`,
+    [
+      { key: 'date', header: 'วันที่', weight: 2 },
+      { key: 'total', header: 'ยอดขาย', weight: 2, align: 'right', format: formatCurrency },
+    ],
+    data.dailySales
+  );
+
+  return pdfBufferFromDoc(doc);
+}
+
 async function buildSalesPdf(data) {
   const doc = newPdfDoc();
   pdfHeader(doc, 'รายงานยอดขาย', `ช่วงวันที่ ${data.range.from} ถึง ${data.range.to} · ส่งออกเมื่อ ${formatDateThai()}`);
@@ -463,6 +542,8 @@ async function buildProfitPdf(data) {
 }
 
 module.exports = {
+  buildDashboardExcel,
+  buildDashboardPdf,
   buildSalesExcel,
   buildStockExcel,
   buildProfitExcel,

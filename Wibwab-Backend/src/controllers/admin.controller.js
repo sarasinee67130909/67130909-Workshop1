@@ -30,6 +30,25 @@ async function dashboard(req, res, next) {
   }
 }
 
+// GET /api/admin/dashboard/export?range=7d|30d&format=xlsx|pdf
+async function dashboardExport(req, res, next) {
+  try {
+    const format = resolveFormat(req);
+    const data = await reportService.getDashboard(req.query);
+    const today = new Date().toISOString().slice(0, 10);
+    const filename = `dashboard-overview_${data.range}_${today}.${format}`;
+    if (format === 'pdf') {
+      const buffer = await exportService.buildDashboardPdf(data);
+      sendFile(res, buffer, filename, 'application/pdf');
+    } else {
+      const buffer = await exportService.buildDashboardExcel(data);
+      sendFile(res, buffer, filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
+  } catch (err) {
+    next(err);
+  }
+}
+
 // GET /api/admin/reports/sales?from=&to=&category=
 async function salesReport(req, res, next) {
   try {
@@ -117,6 +136,7 @@ async function profitReportExport(req, res, next) {
 
 module.exports = {
   dashboard,
+  dashboardExport,
   salesReport,
   stockReport,
   profitReport,

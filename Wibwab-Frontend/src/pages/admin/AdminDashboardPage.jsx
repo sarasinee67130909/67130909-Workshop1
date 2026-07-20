@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getAdminDashboard } from '../../api/admin.api';
+import { getAdminDashboard, exportAdminDashboard } from '../../api/admin.api';
+import ExportMenu from '../../components/common/ExportMenu';
 
 function formatCurrency(n) {
   return `฿${Number(n || 0).toLocaleString('th-TH', { maximumFractionDigits: 0 })}`;
@@ -65,10 +66,7 @@ export default function AdminDashboardPage() {
               {range === '7d' ? '7 วันล่าสุด' : '30 วันล่าสุด'}
             </span>
           </div>
-          <button className="admin-btn admin-btn--primary">
-            <span>ส่งออก</span>
-            <span className="material-symbols-outlined">download</span>
-          </button>
+          <ExportMenu onExport={(format) => exportAdminDashboard({ range, format })} label="ส่งออก" />
         </div>
       </div>
 
