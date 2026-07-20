@@ -1,36 +1,56 @@
-import { useState } from 'react';
-// TODO: import { getAdminDashboard } from '../../api/admin.api';
+import { useEffect, useState } from 'react';
+import { getAdminDashboard } from '../../api/admin.api';
 
-// Mock data — แทนที่ด้วยผลลัพธ์จาก GET /api/admin/dashboard เมื่อ backend พร้อม
-const MOCK_KPIS = [
-  { label: 'ยอดขายวันนี้', value: '฿142,500', trend: '+12.5%', trendTone: 'up' },
-  { label: 'รายได้เดือนนี้', value: '฿4,250,000', trend: '+8.2%', trendTone: 'up' },
-  { label: 'คำสั่งซื้อทั้งหมด', value: '1,842', trend: '0.0%', trendTone: 'flat' },
-  { label: 'ลูกค้าใหม่', value: '854', trend: '-3.2%', trendTone: 'down' },
-];
+function formatCurrency(n) {
+  return `฿${Number(n || 0).toLocaleString('th-TH', { maximumFractionDigits: 0 })}`;
+}
 
-// จุดข้อมูลยอดขายรายวัน (ความสูงเป็น % สำหรับกราฟแท่งอย่างง่าย — ไม่ใช้ library เพิ่ม)
-const MOCK_DAILY_SALES = [55, 45, 47, 62, 56, 76, 62, 90, 82, 55, 88, 61, 87, 60, 100];
-
-const MOCK_CHANNELS = [
-  { label: 'เว็บไซต์', percent: 45, color: 'var(--admin-primary)' },
-  { label: 'Shopee', percent: 30, color: '#94a3b8' },
-  { label: 'Lazada', percent: 15, color: '#cbd5e1' },
-  { label: 'Instagram', percent: 10, color: '#e2e8f0' },
-];
-
-const MOCK_TOP_PRODUCTS = [
-  { name: 'Celestial Pendant', category: 'สร้อยคอ', sold: 420, revenue: '฿630,000' },
-  { name: 'Gold Chain Link', category: 'สร้อยคอ', sold: 312, revenue: '฿468,000' },
-  { name: 'Radiant Cut Ring', category: 'แหวน', sold: 285, revenue: '฿855,000' },
-];
+function formatPct(p) {
+  if (p === null || p === undefined) return null;
+  const tone = p > 0 ? 'up' : p < 0 ? 'down' : 'flat';
+  return { text: `${p > 0 ? '+' : ''}${p}%`, tone };
+}
 
 export default function AdminDashboardPage() {
-  const [range, setRange] = useState('7D');
-  const kpis = MOCK_KPIS;
-  const dailySales = MOCK_DAILY_SALES;
-  const channels = MOCK_CHANNELS;
-  const topProducts = MOCK_TOP_PRODUCTS;
+  const [range, setRange] = useState('7d');
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    getAdminDashboard(range)
+      .then((res) => {
+        if (!active || !res.success) return;
+        setData(res.data);
+        setError('');
+      })
+      .catch((err) => {
+        if (active) setError(err.response?.data?.message || 'โหลดข้อมูลแดชบอร์ดไม่สำเร็จ');
+      })
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
+  }, [range]);
+
+  const k = data?.kpis;
+  const revenueTrend = formatPct(k?.revenue_this_month_change_pct);
+  const customersTrend = formatPct(k?.new_customers_change_pct);
+
+  const kpis = k
+    ? [
+        { label: 'ยอดขายวันนี้', value: formatCurrency(k.sales_today) },
+        { label: 'รายได้เดือนนี้', value: formatCurrency(k.revenue_this_month), trend: revenueTrend },
+        { label: 'คำสั่งซื้อทั้งหมด', value: k.total_orders.toLocaleString('th-TH') },
+        { label: 'ลูกค้าใหม่ (30 วัน)', value: k.new_customers_30d.toLocaleString('th-TH'), trend: customersTrend },
+      ]
+    : [];
+
+  const dailySales = data?.dailySales || [];
+  const maxDaily = Math.max(1, ...dailySales.map((d) => d.total));
+  const topProducts = data?.topProducts || [];
 
   return (
     <div>
@@ -41,7 +61,9 @@ export default function AdminDashboardPage() {
             <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--admin-text-muted)' }}>
               calendar_today
             </span>
-            <span style={{ fontSize: 13, color: 'var(--admin-text-muted)' }}>1 - 31 พ.ค. 2569</span>
+            <span style={{ fontSize: 13, color: 'var(--admin-text-muted)' }}>
+              {range === '7d' ? '7 วันล่าสุด' : '30 วันล่าสุด'}
+            </span>
           </div>
           <button className="admin-btn admin-btn--primary">
             <span>ส่งออก</span>
@@ -50,87 +72,81 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
+      {error && <p className="admin-login__error">{error}</p>}
+
       {/* KPI Cards */}
       <div className="admin-kpi-grid">
-        {kpis.map((kpi) => (
-          <div className="admin-kpi-card" key={kpi.label}>
+        {(loading ? Array.from({ length: 4 }) : kpis).map((kpi, i) => (
+          <div className="admin-kpi-card" key={kpi?.label || i}>
             <div className="admin-kpi-card__top">
               <span className="admin-kpi-card__label" style={{ textTransform: 'none', letterSpacing: 0 }}>
-                {kpi.label}
+                {kpi?.label || 'กำลังโหลด...'}
               </span>
-              <span className={`admin-trend admin-trend--${kpi.trendTone}`}>
-                {kpi.trendTone === 'up' && <span className="material-symbols-outlined">arrow_upward</span>}
-                {kpi.trendTone === 'down' && <span className="material-symbols-outlined">arrow_downward</span>}
-                {kpi.trendTone === 'flat' && <span className="material-symbols-outlined">remove</span>}
-                {kpi.trend}
-              </span>
+              {kpi?.trend && (
+                <span className={`admin-trend admin-trend--${kpi.trend.tone}`}>
+                  {kpi.trend.tone === 'up' && <span className="material-symbols-outlined">arrow_upward</span>}
+                  {kpi.trend.tone === 'down' && <span className="material-symbols-outlined">arrow_downward</span>}
+                  {kpi.trend.tone === 'flat' && <span className="material-symbols-outlined">remove</span>}
+                  {kpi.trend.text}
+                </span>
+              )}
             </div>
-            <div className="admin-kpi-card__value">{kpi.value}</div>
+            <div className="admin-kpi-card__value">{kpi?.value ?? '—'}</div>
           </div>
         ))}
       </div>
 
-      {/* Charts row */}
-      <div className="admin-dashboard-grid">
-        <div className="admin-card">
-          <div className="admin-card__header">
-            <h3>ยอดขายรายวัน</h3>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                onClick={() => setRange('7D')}
-                className="admin-btn admin-btn--secondary"
-                style={{ height: 28, padding: '0 12px', fontSize: 12 }}
-              >
-                7 วัน
-              </button>
-              <button
-                onClick={() => setRange('30D')}
-                className="admin-btn admin-btn--secondary"
-                style={{ height: 28, padding: '0 12px', fontSize: 12 }}
-              >
-                30 วัน
-              </button>
-            </div>
+      {/* ยอดขายรายวัน */}
+      <div className="admin-card" style={{ marginBottom: 24 }}>
+        <div className="admin-card__header">
+          <h3>ยอดขายรายวัน</h3>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={() => setRange('7d')}
+              className="admin-btn admin-btn--secondary"
+              style={{
+                height: 28,
+                padding: '0 12px',
+                fontSize: 12,
+                ...(range === '7d' ? { borderColor: 'var(--admin-primary)', color: 'var(--admin-primary)' } : {}),
+              }}
+            >
+              7 วัน
+            </button>
+            <button
+              onClick={() => setRange('30d')}
+              className="admin-btn admin-btn--secondary"
+              style={{
+                height: 28,
+                padding: '0 12px',
+                fontSize: 12,
+                ...(range === '30d' ? { borderColor: 'var(--admin-primary)', color: 'var(--admin-primary)' } : {}),
+              }}
+            >
+              30 วัน
+            </button>
           </div>
-          <div className="admin-card__body">
+        </div>
+        <div className="admin-card__body">
+          {!loading && dailySales.length === 0 ? (
+            <p style={{ color: 'var(--admin-text-muted)', fontSize: 13 }}>ยังไม่มีข้อมูลยอดขายในช่วงนี้</p>
+          ) : (
             <div className="admin-chart-bars">
-              {dailySales.map((h, i) => (
+              {(loading ? Array.from({ length: 7 }) : dailySales).map((d, i) => (
                 <div
-                  key={i}
+                  key={d?.date || i}
                   className="admin-chart-bars__bar"
-                  style={{ height: `${h}%` }}
-                  title={`${h}%`}
+                  style={{ height: `${d ? Math.max(2, (d.total / maxDaily) * 100) : 4}%` }}
+                  title={d ? `${d.date}: ${formatCurrency(d.total)}` : ''}
                 />
               ))}
             </div>
-          </div>
-        </div>
-
-        <div className="admin-card">
-          <div className="admin-card__header">
-            <h3>ยอดขายตามช่องทาง</h3>
-          </div>
-          <div className="admin-card__body">
-            {channels.map((ch) => (
-              <div className="admin-progress-row" key={ch.label}>
-                <div className="admin-progress-row__label">
-                  <span style={{ color: 'var(--admin-text-muted)' }}>{ch.label}</span>
-                  <span>{ch.percent}%</span>
-                </div>
-                <div className="admin-progress-track">
-                  <div
-                    className="admin-progress-fill"
-                    style={{ width: `${ch.percent}%`, backgroundColor: ch.color }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+          )}
         </div>
       </div>
 
       {/* Top selling products table */}
-      <div className="admin-card" style={{ marginTop: 24 }}>
+      <div className="admin-card">
         <div className="admin-card__header">
           <h3>สินค้าขายดี</h3>
         </div>
@@ -145,8 +161,15 @@ export default function AdminDashboardPage() {
               </tr>
             </thead>
             <tbody>
+              {!loading && topProducts.length === 0 && (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', color: 'var(--admin-text-muted)' }}>
+                    ยังไม่มีข้อมูลยอดขาย
+                  </td>
+                </tr>
+              )}
               {topProducts.map((p) => (
-                <tr key={p.name}>
+                <tr key={p.product_id}>
                   <td>
                     <div className="admin-cell-thumb">
                       <div className="admin-cell-thumb-placeholder">
@@ -157,26 +180,13 @@ export default function AdminDashboardPage() {
                   </td>
                   <td style={{ color: 'var(--admin-text-muted)' }}>{p.category}</td>
                   <td className="align-right">{p.sold}</td>
-                  <td className="align-right">{p.revenue}</td>
+                  <td className="align-right">{formatCurrency(p.revenue)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
-
-      <style>{`
-        .admin-dashboard-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 24px;
-        }
-        @media (min-width: 1024px) {
-          .admin-dashboard-grid {
-            grid-template-columns: 3fr 1fr;
-          }
-        }
-      `}</style>
     </div>
   );
 }

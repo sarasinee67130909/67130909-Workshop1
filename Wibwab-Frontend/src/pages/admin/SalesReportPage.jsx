@@ -1,27 +1,80 @@
-import { useState } from 'react';
-// TODO: import { getSalesReport } from '../../api/admin.api';
+import { useEffect, useMemo, useState } from 'react';
+import { getSalesReport } from '../../api/admin.api';
+import { getStaffCategories } from '../../api/staff.api';
 
-const MOCK_KPIS = [
-  { label: 'รายได้รวม', value: '฿ 4,250,000', trend: '+12.5%', trendTone: 'up' },
-  { label: 'กำไรขั้นต้น', value: '฿ 1,870,000', trend: '+8.2%', trendTone: 'up' },
-  { label: 'มูลค่าเฉลี่ยต่อออเดอร์', value: '฿ 42,500', trend: '0.0%', trendTone: 'flat' },
-  { label: 'อัตราการเปลี่ยนเป็นลูกค้า', value: '4.8%', trend: '+2.1%', trendTone: 'up' },
-];
+function formatCurrency(n) {
+  return `฿ ${Number(n || 0).toLocaleString('th-TH', { maximumFractionDigits: 0 })}`;
+}
 
-// ความสูงกราฟแท่งรายวัน (%) — สีสลับเพื่อไล่สายตา ไม่ได้สื่อความหมายพิเศษ
-const MOCK_DAILY_BARS = [40, 60, 30, 80, 50, 75, 45, 90, 100, 65, 85, 55, 70, 95];
+function toDateStr(d) {
+  return d.toISOString().slice(0, 10);
+}
 
-const MOCK_BEST_SELLERS = [
-  { category: 'สร้อยคอ High Jewelry', sold: 24, revenue: '฿ 1,200,000', profit: '฿ 540,000' },
-  { category: 'แหวนเพชรหมั้น', sold: 45, revenue: '฿ 950,000', profit: '฿ 425,000' },
-  { category: 'สร้อยข้อมือเทนนิส', sold: 62, revenue: '฿ 780,000', profit: '฿ 310,000' },
-  { category: 'นาฬิกาหรู', sold: 18, revenue: '฿ 640,000', profit: '฿ 220,000' },
-  { category: 'ต่างหูทอง', sold: 89, revenue: '฿ 450,000', profit: '฿ 180,000' },
-];
+// สร้างตัวเลือกเดือนย้อนหลัง 6 เดือน (รวมเดือนปัจจุบัน) พร้อมช่วง from/to ของแต่ละเดือน
+function buildMonthOptions() {
+  const now = new Date();
+  const options = [];
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
+    const year = d.getUTCFullYear();
+    const month = d.getUTCMonth();
+    const from = toDateStr(new Date(Date.UTC(year, month, 1)));
+    const isCurrentMonth = i === 0;
+    const lastDay = new Date(Date.UTC(year, month + 1, 0));
+    const to = isCurrentMonth ? toDateStr(now) : toDateStr(lastDay);
+    const label = d.toLocaleDateString('th-TH', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+    options.push({ value: `${year}-${String(month + 1).padStart(2, '0')}`, label, from, to });
+  }
+  return options;
+}
 
 export default function SalesReportPage() {
-  const [month, setMonth] = useState('พ.ค. 2569');
+  const monthOptions = useMemo(buildMonthOptions, []);
+  const [monthValue, setMonthValue] = useState(monthOptions[0].value);
   const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    getStaffCategories()
+      .then((res) => res.success && setCategories(res.data))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const selected = monthOptions.find((m) => m.value === monthValue) || monthOptions[0];
+    let active = true;
+    setLoading(true);
+    getSalesReport({ from: selected.from, to: selected.to, category: category || undefined })
+      .then((res) => {
+        if (!active || !res.success) return;
+        setData(res.data);
+        setError('');
+      })
+      .catch((err) => {
+        if (active) setError(err.response?.data?.message || 'โหลดรายงานยอดขายไม่สำเร็จ');
+      })
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
+  }, [monthValue, category, monthOptions]);
+
+  const k = data?.kpis;
+  const kpis = k
+    ? [
+        { label: 'รายได้รวม', value: formatCurrency(k.total_revenue) },
+        { label: 'กำไรขั้นต้น', value: formatCurrency(k.gross_profit) },
+        { label: 'มูลค่าเฉลี่ยต่อออเดอร์', value: formatCurrency(k.avg_order_value) },
+        { label: 'จำนวนออเดอร์', value: k.order_count.toLocaleString('th-TH') },
+      ]
+    : [];
+
+  const dailySales = data?.dailySales || [];
+  const maxDaily = Math.max(1, ...dailySales.map((d) => d.total));
+  const bestSellers = data?.bestSellersByCategory || [];
 
   return (
     <div>
@@ -29,16 +82,20 @@ export default function SalesReportPage() {
         <h1>รายงานยอดขาย</h1>
         <div className="admin-page-header__actions">
           <div className="admin-filters">
-            <select className="admin-select" value={month} onChange={(e) => setMonth(e.target.value)}>
-              <option>พ.ค. 2569</option>
-              <option>เม.ย. 2569</option>
-              <option>มี.ค. 2569</option>
+            <select className="admin-select" value={monthValue} onChange={(e) => setMonthValue(e.target.value)}>
+              {monthOptions.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
             </select>
             <select className="admin-select" value={category} onChange={(e) => setCategory(e.target.value)}>
               <option value="">ทุกหมวดหมู่</option>
-              <option value="necklaces">สร้อยคอ</option>
-              <option value="rings">แหวน</option>
-              <option value="bracelets">กำไล</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
             </select>
           </div>
           <button className="admin-btn admin-btn--primary">
@@ -48,21 +105,18 @@ export default function SalesReportPage() {
         </div>
       </div>
 
+      {error && <p className="admin-login__error">{error}</p>}
+
       {/* KPI Cards */}
       <div className="admin-kpi-grid">
-        {MOCK_KPIS.map((kpi) => (
-          <div className="admin-kpi-card" key={kpi.label}>
+        {(loading ? Array.from({ length: 4 }) : kpis).map((kpi, i) => (
+          <div className="admin-kpi-card" key={kpi?.label || i}>
             <div className="admin-kpi-card__top">
               <span className="admin-kpi-card__label" style={{ textTransform: 'none', letterSpacing: 0 }}>
-                {kpi.label}
-              </span>
-              <span className={`admin-trend admin-trend--${kpi.trendTone}`}>
-                {kpi.trendTone === 'up' && <span className="material-symbols-outlined">arrow_upward</span>}
-                {kpi.trendTone === 'flat' && <span className="material-symbols-outlined">remove</span>}
-                {kpi.trend}
+                {kpi?.label || 'กำลังโหลด...'}
               </span>
             </div>
-            <div className="admin-kpi-card__value">{kpi.value}</div>
+            <div className="admin-kpi-card__value">{kpi?.value ?? '—'}</div>
           </div>
         ))}
       </div>
@@ -77,100 +131,67 @@ export default function SalesReportPage() {
           </div>
         </div>
         <div className="admin-card__body">
-          <div className="admin-chart-bars">
-            {MOCK_DAILY_BARS.map((h, i) => (
-              <div
-                key={i}
-                className={`admin-chart-bars__bar${i % 3 === 2 ? ' admin-chart-bars__bar--alt' : ''}`}
-                style={{ height: `${h}%` }}
-              />
-            ))}
-          </div>
-          <div className="admin-chart-x-labels">
-            <span>1</span>
-            <span>5</span>
-            <span>10</span>
-            <span>15</span>
-            <span>20</span>
-            <span>25</span>
-            <span>31</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom row: best sellers table + seasonal comparison */}
-      <div className="admin-sales-bottom-grid">
-        <div className="admin-card admin-sales-bottom-grid__table">
-          <div className="admin-card__header">
-            <h3>สินค้าขายดีตามหมวดหมู่</h3>
-          </div>
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>หมวดหมู่</th>
-                  <th className="align-right">จำนวนที่ขาย</th>
-                  <th className="align-right">รายได้ (฿)</th>
-                  <th className="align-right">กำไร (฿)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {MOCK_BEST_SELLERS.map((row) => (
-                  <tr key={row.category}>
-                    <td className="admin-cell-primary">{row.category}</td>
-                    <td className="align-right">{row.sold}</td>
-                    <td className="align-right">{row.revenue}</td>
-                    <td className="align-right admin-cell-gold">{row.profit}</td>
-                  </tr>
+          {!loading && dailySales.length === 0 ? (
+            <p style={{ color: 'var(--admin-text-muted)', fontSize: 13 }}>ยังไม่มีข้อมูลยอดขายในช่วงนี้</p>
+          ) : (
+            <>
+              <div className="admin-chart-bars">
+                {(loading ? Array.from({ length: 30 }) : dailySales).map((d, i) => (
+                  <div
+                    key={d?.date || i}
+                    className={`admin-chart-bars__bar${i % 3 === 2 ? ' admin-chart-bars__bar--alt' : ''}`}
+                    style={{ height: `${d ? Math.max(2, (d.total / maxDaily) * 100) : 4}%` }}
+                    title={d ? `${d.date}: ${formatCurrency(d.total)}` : ''}
+                  />
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="admin-card" style={{ padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>เทียบตามฤดูกาล</h3>
-              <span className="material-symbols-outlined" style={{ color: 'var(--admin-text-muted)' }}>calendar_month</span>
-            </div>
-            <p style={{ fontSize: 14, color: 'var(--admin-text-muted)', margin: '0 0 16px' }}>
-              พ.ค. 2569 เทียบกับ พ.ค. 2568
-            </p>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 32 }}>
-              <div>
-                <div style={{ fontSize: 12, color: 'var(--admin-text-muted)', marginBottom: 4 }}>พ.ค. 2569</div>
-                <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--admin-text)' }}>฿ 4.25M</div>
               </div>
-              <span className="admin-trend admin-trend--up">
-                <span className="material-symbols-outlined">arrow_upward</span>
-                18.4%
-              </span>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: 'var(--admin-text-muted)', marginBottom: 4 }}>พ.ค. 2568</div>
-              <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--admin-text-muted)' }}>฿ 3.59M</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 64, marginTop: 16 }}>
-            <div style={{ width: '50%', height: '60%', backgroundColor: 'var(--admin-border)', borderRadius: '2px 2px 0 0' }} />
-            <div style={{ width: '50%', height: '85%', backgroundColor: 'var(--admin-gold)', borderRadius: '2px 2px 0 0' }} />
-          </div>
+              <div className="admin-chart-x-labels">
+                <span>{dailySales[0]?.date?.slice(-2)}</span>
+                <span>{dailySales[Math.floor(dailySales.length * 0.25)]?.date?.slice(-2)}</span>
+                <span>{dailySales[Math.floor(dailySales.length * 0.5)]?.date?.slice(-2)}</span>
+                <span>{dailySales[Math.floor(dailySales.length * 0.75)]?.date?.slice(-2)}</span>
+                <span>{dailySales[dailySales.length - 1]?.date?.slice(-2)}</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      <style>{`
-        .admin-sales-bottom-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 24px;
-        }
-        @media (min-width: 1024px) {
-          .admin-sales-bottom-grid {
-            grid-template-columns: 2fr 1fr;
-          }
-        }
-      `}</style>
+      {/* Best sellers by category */}
+      <div className="admin-card">
+        <div className="admin-card__header">
+          <h3>สินค้าขายดีตามหมวดหมู่</h3>
+        </div>
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>หมวดหมู่</th>
+                <th className="align-right">จำนวนที่ขาย</th>
+                <th className="align-right">รายได้ (฿)</th>
+                <th className="align-right">กำไร (฿)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {!loading && bestSellers.length === 0 && (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', color: 'var(--admin-text-muted)' }}>
+                    ยังไม่มีข้อมูลยอดขายในช่วงนี้
+                  </td>
+                </tr>
+              )}
+              {bestSellers.map((row) => (
+                <tr key={row.category_id}>
+                  <td className="admin-cell-primary">{row.category}</td>
+                  <td className="align-right">{row.sold}</td>
+                  <td className="align-right">{formatCurrency(row.revenue)}</td>
+                  <td className="align-right admin-cell-gold">{formatCurrency(row.profit)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

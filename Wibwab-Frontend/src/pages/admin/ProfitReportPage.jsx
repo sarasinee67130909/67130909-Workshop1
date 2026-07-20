@@ -1,49 +1,101 @@
-// TODO: import { getProfitReport } from '../../api/admin.api';
+import { useEffect, useMemo, useState } from 'react';
+import { getProfitReport } from '../../api/admin.api';
 
-const MOCK_KPIS = [
-  { label: 'รายได้รวม', value: '฿ 45,280,000', trend: '+10.2%', trendTone: 'up' },
-  { label: 'ต้นทุนรวม', value: '฿ 26,081,280', trend: null },
-  { label: 'กำไรขั้นต้น', value: '฿ 19,198,720', trend: '+8.5%', trendTone: 'up', gold: true },
-  { label: 'อัตรากำไรสุทธิ', value: '42.4%', trend: null },
-];
-
-// จุดข้อมูลกราฟเส้นรายเดือน (0-100) — วาดด้วย SVG polyline ธรรมดา ไม่ใช้ library เพิ่ม
-const MOCK_MONTHLY_POINTS = [50, 40, 60, 80, 70, 110, 100, 130, 115, 160, 155, 180];
 const MONTH_LABELS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+const CATEGORY_COLORS = ['#b08d57', '#1e293b', '#64748b', '#e2e8f0', '#94a3b8', '#0f766e'];
 
-const MOCK_MONTHLY_BREAKDOWN = [
-  { month: 'ธันวาคม', revenue: '฿ 5,200,000', cost: '฿ 2,800,000', profit: '฿ 2,400,000', margin: '46.1%' },
-  { month: 'พฤศจิกายน', revenue: '฿ 4,850,000', cost: '฿ 2,750,000', profit: '฿ 2,100,000', margin: '43.2%' },
-  { month: 'ตุลาคม', revenue: '฿ 3,900,000', cost: '฿ 2,300,000', profit: '฿ 1,600,000', margin: '41.0%' },
-  { month: 'กันยายน', revenue: '฿ 4,100,000', cost: '฿ 2,450,000', profit: '฿ 1,650,000', margin: '40.2%' },
-];
+function formatCurrency(n) {
+  return `฿ ${Number(n || 0).toLocaleString('th-TH', { maximumFractionDigits: 0 })}`;
+}
 
-const MOCK_PROFIT_BY_CATEGORY = [
-  { category: 'แหวน', profit: '฿ 8,450,000', color: '#b08d57' },
-  { category: 'สร้อยคอ', profit: '฿ 5,230,000', color: '#1e293b' },
-  { category: 'ต่างหู', profit: '฿ 3,800,000', color: '#64748b' },
-  { category: 'กำไล', profit: '฿ 1,718,720', color: '#e2e8f0' },
-];
+function toDateStr(d) {
+  return d.toISOString().slice(0, 10);
+}
 
-// แปลงจุดข้อมูล (0-100) เป็น path points ของ SVG viewBox 0 0 1000 200 (แกน y กลับด้าน)
+// แปลงจุดข้อมูล (ตัวเลขจริง) เป็น path points ของ SVG viewBox 0 0 1000 200 (แกน y กลับด้าน)
 function toSvgPoints(values) {
-  const max = Math.max(...values);
-  const step = 1000 / (values.length - 1);
+  const max = Math.max(1, ...values);
+  const step = values.length > 1 ? 1000 / (values.length - 1) : 0;
   return values
-    .map((v, i) => `${Math.round(i * step)},${Math.round(200 - (v / max) * 180)}`)
+    .map((v, i) => `${Math.round(i * step)},${Math.round(200 - (Math.max(0, v) / max) * 180)}`)
     .join(' ');
 }
 
+function monthLabel(ym) {
+  const [, m] = ym.split('-').map(Number);
+  return MONTH_LABELS[m - 1];
+}
+
+function monthFullLabel(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString('th-TH', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
 export default function ProfitReportPage() {
-  const points = toSvgPoints(MOCK_MONTHLY_POINTS);
-  const pointCoords = points.split(' ').map((p) => p.split(',').map(Number));
+  // ค่าเริ่มต้น: ปีปฏิทินปัจจุบัน (1 ม.ค. — วันนี้) ให้ครอบคลุมแนวโน้มรายเดือนทั้งปี
+  const defaultRange = useMemo(() => {
+    const now = new Date();
+    return { from: `${now.getUTCFullYear()}-01-01`, to: toDateStr(now) };
+  }, []);
+
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    getProfitReport(defaultRange)
+      .then((res) => {
+        if (!active || !res.success) return;
+        setData(res.data);
+        setError('');
+      })
+      .catch((err) => {
+        if (active) setError(err.response?.data?.message || 'โหลดรายงานกำไรไม่สำเร็จ');
+      })
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
+  }, [defaultRange]);
+
+  const k = data?.kpis;
+  const kpis = k
+    ? [
+        { label: 'รายได้รวม', value: formatCurrency(k.total_revenue) },
+        { label: 'ต้นทุนรวม', value: formatCurrency(k.total_cost) },
+        {
+          label: 'กำไรขั้นต้น',
+          value: formatCurrency(k.gross_profit),
+          gold: true,
+          trend:
+            k.gross_profit_change_pct !== null
+              ? { text: `${k.gross_profit_change_pct > 0 ? '+' : ''}${k.gross_profit_change_pct}%`, tone: k.gross_profit_change_pct >= 0 ? 'up' : 'down' }
+              : null,
+        },
+        { label: 'อัตรากำไรขั้นต้น', value: `${k.margin_pct}%` },
+      ]
+    : [];
+
+  const monthlyTrend = data?.monthlyTrend || [];
+  const points = toSvgPoints(monthlyTrend.map((m) => m.profit));
+  const pointCoords = points ? points.split(' ').map((p) => p.split(',').map(Number)) : [];
+  const monthlyBreakdown = [...monthlyTrend].reverse(); // ล่าสุดขึ้นก่อน
+  const profitByCategory = data?.profitByCategory || [];
 
   return (
     <div>
       <div className="admin-page-header">
         <h1>รายงานกำไร</h1>
         <div className="admin-page-header__actions">
-          <span className="admin-link-btn">ช่วงวันที่</span>
+          <span className="admin-link-btn">
+            {defaultRange.from} — {defaultRange.to}
+          </span>
           <button className="admin-btn admin-btn--primary">
             <span className="material-symbols-outlined">download</span>
             ส่งออกเป็น Excel
@@ -51,21 +103,25 @@ export default function ProfitReportPage() {
         </div>
       </div>
 
+      {error && <p className="admin-login__error">{error}</p>}
+
       {/* KPI Cards */}
       <div className="admin-kpi-grid">
-        {MOCK_KPIS.map((kpi) => (
-          <div className="admin-kpi-card" key={kpi.label}>
+        {(loading ? Array.from({ length: 4 }) : kpis).map((kpi, i) => (
+          <div className="admin-kpi-card" key={kpi?.label || i}>
             <div className="admin-kpi-card__top">
-              <span className="admin-kpi-card__label">{kpi.label}</span>
-              {kpi.trend && (
-                <span className={`admin-trend admin-trend--${kpi.trendTone}`}>
-                  <span className="material-symbols-outlined">arrow_upward</span>
-                  {kpi.trend}
+              <span className="admin-kpi-card__label">{kpi?.label || 'กำลังโหลด...'}</span>
+              {kpi?.trend && (
+                <span className={`admin-trend admin-trend--${kpi.trend.tone}`}>
+                  <span className="material-symbols-outlined">
+                    {kpi.trend.tone === 'up' ? 'arrow_upward' : 'arrow_downward'}
+                  </span>
+                  {kpi.trend.text}
                 </span>
               )}
             </div>
-            <div className={`admin-kpi-card__value${kpi.gold ? '' : ' admin-kpi-card__value--slate'}`}>
-              {kpi.value}
+            <div className={`admin-kpi-card__value${kpi?.gold ? '' : ' admin-kpi-card__value--slate'}`}>
+              {kpi?.value ?? '—'}
             </div>
           </div>
         ))}
@@ -83,14 +139,16 @@ export default function ProfitReportPage() {
         <div className="admin-card__body">
           <div style={{ width: '100%', height: 240, position: 'relative' }}>
             <svg viewBox="0 0 1000 200" preserveAspectRatio="none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-              <polyline
-                points={points}
-                fill="none"
-                stroke="var(--admin-primary)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              {points && (
+                <polyline
+                  points={points}
+                  fill="none"
+                  stroke="var(--admin-primary)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
               {pointCoords.map(([x, y], i) => (
                 <circle key={i} cx={x} cy={y} r="4" fill="var(--admin-gold)" />
               ))}
@@ -106,8 +164,8 @@ export default function ProfitReportPage() {
                 color: 'var(--admin-text-muted)',
               }}
             >
-              {MONTH_LABELS.map((m) => (
-                <span key={m}>{m}</span>
+              {monthlyTrend.map((m) => (
+                <span key={m.month}>{monthLabel(m.month)}</span>
               ))}
             </div>
           </div>
@@ -132,13 +190,13 @@ export default function ProfitReportPage() {
                 </tr>
               </thead>
               <tbody>
-                {MOCK_MONTHLY_BREAKDOWN.map((row) => (
+                {monthlyBreakdown.map((row) => (
                   <tr key={row.month}>
-                    <td className="admin-cell-primary">{row.month}</td>
-                    <td className="align-right">{row.revenue}</td>
-                    <td className="align-right">{row.cost}</td>
-                    <td className="align-right admin-cell-gold">{row.profit}</td>
-                    <td className="align-right">{row.margin}</td>
+                    <td className="admin-cell-primary">{monthFullLabel(row.month)}</td>
+                    <td className="align-right">{formatCurrency(row.revenue)}</td>
+                    <td className="align-right">{formatCurrency(row.cost)}</td>
+                    <td className="align-right admin-cell-gold">{formatCurrency(row.profit)}</td>
+                    <td className="align-right">{row.margin_pct}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -159,13 +217,22 @@ export default function ProfitReportPage() {
                 </tr>
               </thead>
               <tbody>
-                {MOCK_PROFIT_BY_CATEGORY.map((row) => (
-                  <tr key={row.category}>
+                {!loading && profitByCategory.length === 0 && (
+                  <tr>
+                    <td colSpan={2} style={{ textAlign: 'center', color: 'var(--admin-text-muted)' }}>
+                      ยังไม่มีข้อมูล
+                    </td>
+                  </tr>
+                )}
+                {profitByCategory.map((row, i) => (
+                  <tr key={row.category_id}>
                     <td>
-                      <span className="admin-dot" style={{ backgroundColor: row.color }} />
+                      <span className="admin-dot" style={{ backgroundColor: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }} />
                       {row.category}
                     </td>
-                    <td className="align-right" style={{ fontWeight: 500 }}>{row.profit}</td>
+                    <td className="align-right" style={{ fontWeight: 500 }}>
+                      {formatCurrency(row.profit)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
