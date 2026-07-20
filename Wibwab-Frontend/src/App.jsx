@@ -9,6 +9,8 @@ import OrderHistoryPage from './pages/customer/OrderHistoryPage';
 import LoginPage from './pages/customer/LoginPage';
 import RegisterPage from './pages/customer/RegisterPage';
 import ProfilePage from './pages/customer/ProfilePage';
+import ForgotPasswordPage from './pages/customer/ForgotPasswordPage';
+import ResetPasswordPage from './pages/customer/ResetPasswordPage';
 
 // ── ฝั่งพนักงาน (ธีม Teal) ──
 import StaffLayout from './components/common/StaffLayout';
@@ -48,6 +50,8 @@ function App() {
       <Route path="/cart" element={<CartPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
       {/* Routes สำหรับลูกค้าที่ล็อกอินแล้ว */}
       <Route

@@ -179,3 +179,17 @@ CREATE TABLE reviews (
   FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
   CHECK (rating BETWEEN 1 AND 5)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
+-- password_resets — token สำหรับลืมรหัสผ่าน (§5.11)
+-- จำลองการส่งอีเมล: backend log ลิงก์ + ส่งกลับใน response แทนการส่งอีเมลจริง
+-- ---------------------------------------------------------------------
+CREATE TABLE password_resets (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  token      VARCHAR(255) NOT NULL UNIQUE,
+  user_id    INT NOT NULL,
+  expires_at DATETIME NOT NULL,  -- หมดอายุ 30 นาทีหลังสร้าง
+  used       BOOLEAN NOT NULL DEFAULT FALSE,  -- ใช้ได้ครั้งเดียว
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

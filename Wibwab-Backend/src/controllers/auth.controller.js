@@ -37,4 +37,49 @@ async function logout(req, res, next) {
   }
 }
 
-module.exports = { register, login, me, logout };
+async function forgotPassword(req, res, next) {
+  try {
+    const data = await authService.forgotPassword(req.body.email);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function resetPassword(req, res, next) {
+  try {
+    const data = await authService.resetPassword(req.body.token, req.body.password);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updateProfile(req, res, next) {
+  try {
+    const data = await authService.updateProfile(req.user.id, req.body);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function changePassword(req, res, next) {
+  try {
+    const data = await authService.changePassword(req.user.id, req.body);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = {
+  register,
+  login,
+  me,
+  logout,
+  forgotPassword,
+  resetPassword,
+  updateProfile,
+  changePassword,
+};

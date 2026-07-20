@@ -3006,3 +3006,78 @@
   color: var(--on-surface-variant);
   margin-bottom: 4px;
 }
+
+/* ==========================================================================
+   Forgot / Reset Password Pages
+   ========================================================================== */
+
+/* ─── Floating Label Input (Forgot Password Page) ─── */
+.fp-field {
+  position: relative;
+}
+
+.fp-label {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  font-size: 16px;
+  color: var(--on-surface-variant);
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.fp-input {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--primary-container);
+  padding: 8px 0;
+  color: var(--on-surface);
+  font-size: 16px;
+}
+
+/* เมื่อ focus หรือมีข้อความอยู่ (placeholder ไม่แสดง) ให้ label ลอยขึ้น */
+.fp-input:focus + .fp-label,
+.fp-input:not(:placeholder-shown) + .fp-label {
+  top: -16px;
+  font-size: 12px;
+  color: var(--primary);
+}
+
+.fp-input:focus {
+  outline: none;
+  border-bottom-color: var(--secondary);
+}
+
+/* ─── "Sent" state UI ─── */
+.fp-sent-state {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fp-sent-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--brand-blush);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.fp-sent-icon .material-symbols-outlined {
+  font-size: 36px;
+}
+
+/* ─── Success Panel (Reset Password Page) ─── */
+.fp-success-panel {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 400px;
+}

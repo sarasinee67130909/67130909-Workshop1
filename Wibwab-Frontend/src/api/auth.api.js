@@ -62,3 +62,25 @@ export const changePassword = async (passwordData) => {
   const response = await client.post('/api/auth/change-password', passwordData);
   return response.data;
 };
+
+/**
+ * ส่งคำขอรีเซ็ตรหัสผ่าน
+ * @param {string} email
+ * @returns {Promise<{success: boolean, message?: string}>}
+ */
+export const forgotPassword = async (email) => {
+  // POST /api/auth/forgot-password (ยังไม่มี endpoint จริงใน backend)
+  const response = await client.post('/api/auth/forgot-password', { email });
+  return response.data;
+};
+
+/**
+ * ตั้งรหัสผ่านใหม่โดยใช้ token
+ * @param {object} data - { token, password }
+ * @returns {Promise<{success: boolean, message?: string}>}
+ */
+export const resetPassword = async (data) => {
+  // POST /api/auth/reset-password (ยังไม่มี endpoint จริงใน backend)
+  const response = await client.post('/api/auth/reset-password', data);
+  return response.data;
+};
