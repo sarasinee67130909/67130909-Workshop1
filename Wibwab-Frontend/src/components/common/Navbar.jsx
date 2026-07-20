@@ -65,7 +65,7 @@ function Navbar() {
           {isLoggedIn ? (
             <>
               {/* ล็อกอินแล้ว: ไอคอนคน → ประวัติการสั่งซื้อ + ปุ่มออกจากระบบ */}
-              <Link to="/orders" aria-label="คำสั่งซื้อของฉัน" className="navbar-user" title={user?.full_name}>
+              <Link to="/account" aria-label="บัญชีของฉัน" className="navbar-user" title={user?.full_name}>
                 <span className="material-symbols-outlined">person</span>
                 <span className="navbar-user__name">{user?.full_name?.split(' ')[0]}</span>
               </Link>

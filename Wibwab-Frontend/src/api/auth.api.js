@@ -40,3 +40,25 @@ export const logout = async () => {
   const response = await client.post('/api/auth/logout');
   return response.data;
 };
+
+/**
+ * อัปเดตข้อมูลโปรไฟล์ผู้ใช้ (ชื่อ, เบอร์โทร)
+ * @param {object} profileData - { full_name, phone }
+ * @returns {Promise<{success: boolean, data: {user: object}, message?: string}>}
+ */
+export const updateProfile = async (profileData) => {
+  // PUT /api/auth/profile (ยังไม่มี endpoint จริงใน backend)
+  const response = await client.put('/api/auth/profile', profileData);
+  return response.data;
+};
+
+/**
+ * เปลี่ยนรหัสผ่าน
+ * @param {object} passwordData - { current_password, new_password }
+ * @returns {Promise<{success: boolean, message?: string}>}
+ */
+export const changePassword = async (passwordData) => {
+  // POST /api/auth/change-password (ยังไม่มี endpoint จริงใน backend)
+  const response = await client.post('/api/auth/change-password', passwordData);
+  return response.data;
+};

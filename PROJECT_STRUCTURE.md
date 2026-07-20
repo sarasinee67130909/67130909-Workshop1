@@ -107,6 +107,7 @@
         │   ├── product.api.js
         │   ├── cart.api.js
         │   ├── order.api.js
+        │   ├── address.api.js    # CRUD ที่อยู่จัดส่ง (ยังไม่มี backend รองรับ — mock ผ่าน localStorage)
         │   ├── staff.api.js
         │   └── admin.api.js
         │
@@ -131,7 +132,8 @@
         │   │   ├── LoginPage.jsx
         │   │   ├── RegisterPage.jsx
         │   │   ├── ForgotPasswordPage.jsx  # ขอรีเซ็ต (กรอกอีเมล) + สถานะส่งลิงก์แล้ว
-        │   │   └── ResetPasswordPage.jsx   # ตั้งรหัสใหม่จากลิงก์ (มี token ใน URL)
+        │   │   ├── ResetPasswordPage.jsx   # ตั้งรหัสใหม่จากลิงก์ (มี token ใน URL)
+        │   │   └── ProfilePage.jsx         # @ /account — โปรไฟล์, ไซซ์, ที่อยู่ (CRUD), เปลี่ยนรหัสผ่าน
         │   │
         │   ├── staff/            # ธีม: Teal (#0F766E) / sidebar #134E4A / พื้น #F6F8F8
         │   │   ├── StaffLoginPage.jsx
@@ -191,7 +193,7 @@
 
 ```env
 # Backend
-PORT=3000
+PORT=8080
 JWT_SECRET=change-this-secret
 
 # Database (ตรงกับ docker-compose.yml)
@@ -217,7 +219,7 @@ cd Wibwab-Backend
 docker compose up -d          # MySQL: localhost:3306, phpMyAdmin: localhost:8080
 
 # 2) Backend (terminal เดิม)
-npm install && npm run dev    # http://localhost:3000
+npm install && npm run dev    # http://localhost:8080
 
 # 3) Frontend (เปิด terminal ใหม่)
 cd Wibwab-Frontend

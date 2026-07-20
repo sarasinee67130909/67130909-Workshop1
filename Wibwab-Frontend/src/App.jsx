@@ -8,6 +8,7 @@ import CheckoutPage from './pages/customer/CheckoutPage';
 import OrderHistoryPage from './pages/customer/OrderHistoryPage';
 import LoginPage from './pages/customer/LoginPage';
 import RegisterPage from './pages/customer/RegisterPage';
+import ProfilePage from './pages/customer/ProfilePage';
 
 // ── ฝั่งพนักงาน (ธีม Teal) ──
 import StaffLayout from './components/common/StaffLayout';
@@ -45,10 +46,34 @@ function App() {
       <Route path="/products" element={<ProductListPage />} />
       <Route path="/products/:id" element={<ProductDetailPage />} />
       <Route path="/cart" element={<CartPage />} />
-      <Route path="/checkout" element={<CheckoutPage />} />
-      <Route path="/orders" element={<OrderHistoryPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+
+      {/* Routes สำหรับลูกค้าที่ล็อกอินแล้ว */}
+      <Route
+        path="/checkout"
+        element={
+          <ProtectedRoute role="customer">
+            <CheckoutPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <ProtectedRoute role="customer">
+            <OrderHistoryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/account"
+        element={
+          <ProtectedRoute role="customer">
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ── ฝั่งพนักงาน (ธีม Teal) ── */}
       <Route path="/staff/login" element={<StaffLoginPage />} />

@@ -61,6 +61,15 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // อัปเดตข้อมูล user ใน state และ localStorage (ใช้หลังแก้โปรไฟล์สำเร็จ)
+  const updateUser = (updatedUserData) => {
+    setUser((prevUser) => {
+      const newUser = { ...prevUser, ...updatedUserData };
+      localStorage.setItem('user', JSON.stringify(newUser));
+      return newUser;
+    });
+  };
+
   const value = {
     user,
     token,
@@ -68,6 +77,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    updateUser,
   };
 
   // ยังไม่ render children จนกว่าจะกู้คืน session เสร็จ
