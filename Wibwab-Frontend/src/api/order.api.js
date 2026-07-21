@@ -63,3 +63,12 @@ export async function getMyOrders() {
     return { success: true, data: MOCK_ORDERS, isMock: true };
   }
 }
+
+/**
+ * ตรวจโค้ดส่วนลดกับ backend จริง (แนบ JWT อัตโนมัติถ้าล็อกอินอยู่ — ใช้เช็คสิทธิ์คูปองในกระเป๋า)
+ * @returns {Promise<{success: boolean, data?: object, message?: string}>}
+ */
+export async function validatePromoCode({ code, subtotal }) {
+  const res = await client.post('/api/orders/validate-promo', { code, subtotal });
+  return res.data;
+}

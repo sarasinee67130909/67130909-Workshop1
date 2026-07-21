@@ -1,12 +1,6 @@
 // context/CartContext.jsx — ตะกร้าสินค้าฝั่ง client เก็บใน localStorage (ยังไม่ sync กับ /api/cart)
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-
-// โค้ดส่วนลด mock ตาม seed.sql — TODO: เปลี่ยนเป็นเรียก API ตรวจโค้ดจริงเมื่อ Backend เสร็จ
-const MOCK_PROMOS = {
-  WELCOME10: { type: 'percent', value: 10, minTotal: 500, expired: false },
-  SAVE50: { type: 'fixed', value: 50, minTotal: 300, expired: false },
-  NEWYEAR25: { type: 'percent', value: 25, minTotal: 1000, expired: true }, // ไว้ทดสอบเคสหมดอายุ
-};
+import { validatePromoCode } from '../api/order.api';
 
 const STORAGE_KEY = 'wibwab_cart';
 
@@ -75,20 +69,22 @@ export function CartProvider({ children }) {
 
   const itemCount = useMemo(() => items.reduce((sum, it) => sum + it.qty, 0), [items]);
 
-  // ตรวจและใช้โค้ดส่วนลด — คืน { success, message } ให้ UI แสดงผล
-  const applyPromo = (code) => {
+  // ตรวจและใช้โค้ดส่วนลด (เรียก backend จริง) — คืน { success, message } ให้ UI แสดงผล
+  const applyPromo = async (code) => {
     const normalized = code.trim().toUpperCase();
-    const found = MOCK_PROMOS[normalized];
-    if (!found) return { success: false, message: 'ไม่พบโค้ดส่วนลดนี้' };
-    if (found.expired) return { success: false, message: 'โค้ดนี้หมดอายุแล้ว' };
-    if (subtotal < found.minTotal) {
-      return {
-        success: false,
-        message: `ยอดสั่งซื้อขั้นต่ำ ${found.minTotal.toLocaleString('th-TH')} บาทจึงจะใช้โค้ดนี้ได้`,
-      };
+    try {
+      const res = await validatePromoCode({ code: normalized, subtotal });
+      const data = res.data;
+      setPromo({
+        code: data.code,
+        type: data.discount_type,
+        value: data.discount_value,
+        minTotal: data.min_order_total,
+      });
+      return { success: true, message: `ใช้โค้ด ${normalized} เรียบร้อย` };
+    } catch (err) {
+      return { success: false, message: err.response?.data?.message || 'ตรวจสอบโค้ดไม่สำเร็จ กรุณาลองใหม่' };
     }
-    setPromo({ code: normalized, type: found.type, value: found.value, minTotal: found.minTotal });
-    return { success: true, message: `ใช้โค้ด ${normalized} เรียบร้อย` };
   };
 
   const removePromo = () => setPromo(null);

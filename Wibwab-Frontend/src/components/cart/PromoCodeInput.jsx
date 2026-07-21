@@ -6,11 +6,14 @@ export default function PromoCodeInput() {
   const { promo, applyPromo, removePromo } = useCart();
   const [code, setCode] = useState('');
   const [message, setMessage] = useState(null); // { success, text }
+  const [checking, setChecking] = useState(false);
 
-  const handleApply = (e) => {
+  const handleApply = async (e) => {
     e.preventDefault();
     if (!code.trim()) return;
-    const result = applyPromo(code);
+    setChecking(true);
+    const result = await applyPromo(code);
+    setChecking(false);
     setMessage({ success: result.success, text: result.message });
     if (result.success) setCode('');
   };
@@ -45,8 +48,8 @@ export default function PromoCodeInput() {
           placeholder="โค้ดส่วนลด เช่น WELCOME10"
           aria-label="โค้ดส่วนลด"
         />
-        <button type="submit" className="btn-outline promo-box__apply">
-          ใช้โค้ด
+        <button type="submit" className="btn-outline promo-box__apply" disabled={checking}>
+          {checking ? 'กำลังตรวจสอบ...' : 'ใช้โค้ด'}
         </button>
       </div>
       {message && (

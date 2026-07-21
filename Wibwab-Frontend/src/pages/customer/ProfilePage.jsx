@@ -49,6 +49,7 @@ export default function ProfilePage() {
             <nav className="profile-nav">
               <a onClick={() => scrollToSection('profile')} className="profile-nav__link profile-nav__link--active">ข้อมูลส่วนตัว</a>
               <Link to="/orders" className="profile-nav__link">ประวัติการสั่งซื้อ</Link>
+              <Link to="/coupons" className="profile-nav__link">คูปองของฉัน</Link>
               <a onClick={() => scrollToSection('addresses')} className="profile-nav__link">ที่อยู่ของฉัน</a>
               <a onClick={() => scrollToSection('sizes')} className="profile-nav__link">ไซซ์ของฉัน</a>
               <a onClick={() => scrollToSection('password')} className="profile-nav__link">เปลี่ยนรหัสผ่าน</a>

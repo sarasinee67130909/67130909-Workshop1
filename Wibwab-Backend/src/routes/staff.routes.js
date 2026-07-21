@@ -30,4 +30,11 @@ router.post('/products', staffController.createProduct);
 router.put('/products/:id', staffController.updateProduct);
 router.post('/products/:id/images', uploadProductImage.single('image'), staffController.uploadProductImage);
 
+// ── Coupons ──
+router.get('/promos', staffController.listPromos);
+router.get('/promos/:id', staffController.getPromo);
+router.post('/promos', staffController.createPromo);
+router.put('/promos/:id', staffController.updatePromo);
+router.post('/promos/:id/push', staffController.pushPromo);
+
 module.exports = router;

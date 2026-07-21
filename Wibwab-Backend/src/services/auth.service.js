@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const pool = require('../config/db');
 const { isEmail, isNonEmptyString, httpError } = require('../utils/validators');
+const couponService = require('./coupon.service');
 
 const RESET_TOKEN_TTL_MINUTES = 30;
 
@@ -32,6 +33,12 @@ async function register({ email, password, full_name, phone }) {
     "INSERT INTO users (email, password_hash, full_name, phone, role) VALUES (?, ?, ?, ?, 'customer')",
     [email, password_hash, full_name, phone || null]
   );
+
+  // แจกคูปองต้อนรับสมาชิกใหม่แบบอัตโนมัติ (ถ้ามีโค้ดที่ตั้ง push_trigger='on_register' ไว้)
+  // ไม่ await/throw เพื่อไม่ให้การแจกคูปองพลาดจนสมัครสมาชิกไม่สำเร็จ
+  couponService.grantWelcomeCoupons(result.insertId).catch((err) => {
+    console.error('แจกคูปองต้อนรับสมาชิกใหม่ไม่สำเร็จ:', err);
+  });
 
   const user = { id: result.insertId, role: 'customer', full_name };
   return {

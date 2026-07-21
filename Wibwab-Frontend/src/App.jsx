@@ -11,6 +11,7 @@ import RegisterPage from './pages/customer/RegisterPage';
 import ProfilePage from './pages/customer/ProfilePage';
 import ForgotPasswordPage from './pages/customer/ForgotPasswordPage';
 import ResetPasswordPage from './pages/customer/ResetPasswordPage';
+import MyCouponsPage from './pages/customer/MyCouponsPage';
 
 // ── ฝั่งพนักงาน (ธีม Teal) ──
 import StaffLayout from './components/common/StaffLayout';
@@ -19,6 +20,8 @@ import StaffDashboardPage from './pages/staff/StaffDashboardPage';
 import OrderManagePage from './pages/staff/OrderManagePage';
 import InventoryPage from './pages/staff/InventoryPage';
 import ProductManagePage from './pages/staff/ProductManagePage';
+import PromoManagePage from './pages/staff/PromoManagePage';
+import PromoEditPage from './pages/staff/PromoEditPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 // ── ฝั่งแอดมิน/ผู้บริหาร (ธีม Slate + ทอง) ──
@@ -78,6 +81,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/coupons"
+        element={
+          <ProtectedRoute role="customer">
+            <MyCouponsPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ── ฝั่งพนักงาน (ธีม Teal) ── */}
       <Route path="/staff/login" element={<StaffLoginPage />} />
@@ -96,6 +107,9 @@ function App() {
         <Route path="products" element={<ProductManagePage />} />
         <Route path="products/new" element={<ProductManagePage />} />
         <Route path="products/:id" element={<ProductManagePage />} />
+        <Route path="promos" element={<PromoManagePage />} />
+        <Route path="promos/new" element={<PromoEditPage />} />
+        <Route path="promos/:id" element={<PromoEditPage />} />
       </Route>
 
       {/* ── ฝั่งแอดมิน/ผู้บริหาร (ธีม Slate + ทอง) ── */}

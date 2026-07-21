@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: '/staff/orders', label: 'คำสั่งซื้อ', icon: 'shopping_cart' },
   { to: '/staff/inventory', label: 'คลังสินค้า', icon: 'inventory_2' },
   { to: '/staff/products', label: 'สินค้า', icon: 'diamond' },
+  { to: '/staff/promos', label: 'โปรโมชั่น', icon: 'local_offer' },
 ];
 
 /**

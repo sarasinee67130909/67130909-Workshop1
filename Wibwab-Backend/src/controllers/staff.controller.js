@@ -1,5 +1,6 @@
 // controllers/staff.controller.js — รับ req → เรียก service → ส่ง response
 const staffService = require('../services/staff.service');
+const couponService = require('../services/coupon.service');
 const { httpError } = require('../utils/validators');
 
 // ── Dashboard ──
@@ -139,6 +140,52 @@ async function uploadProductImage(req, res, next) {
   }
 }
 
+// ── Coupons ──
+async function listPromos(req, res, next) {
+  try {
+    const data = await couponService.listPromoCodes(req.query);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getPromo(req, res, next) {
+  try {
+    const data = await couponService.getPromoCode(req.params.id);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function createPromo(req, res, next) {
+  try {
+    const data = await couponService.createPromoCode(req.body);
+    res.status(201).json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updatePromo(req, res, next) {
+  try {
+    const data = await couponService.updatePromoCode(req.params.id, req.body);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function pushPromo(req, res, next) {
+  try {
+    const data = await couponService.pushCouponToAllCustomers(req.params.id);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   dashboard,
   listOrders,
@@ -154,4 +201,9 @@ module.exports = {
   createProduct,
   updateProduct,
   uploadProductImage,
+  listPromos,
+  getPromo,
+  createPromo,
+  updatePromo,
+  pushPromo,
 };

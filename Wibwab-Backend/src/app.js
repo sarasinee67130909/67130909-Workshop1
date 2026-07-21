@@ -23,6 +23,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/addresses', addressRoutes);
+app.use('/api/coupons', require('./routes/coupon.routes'));
 
 // TODO(Dev2): mount routes ฝั่งพนักงาน/แอดมินตรงนี้เมื่อพร้อม
 app.use('/api/staff', require('./routes/staff.routes'));

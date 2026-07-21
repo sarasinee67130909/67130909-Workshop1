@@ -1,6 +1,20 @@
 // controllers/order.controller.js — รับ req → เรียก service → ส่ง response
+const jwt = require('jsonwebtoken');
 const orderService = require('../services/order.service');
 const { httpError } = require('../utils/validators');
+
+// validate-promo เป็น public route (ไม่มี verifyToken) แต่ถ้ามี token แนบมาก็อยากรู้ตัวลูกค้า
+// เพื่อเช็คสิทธิ์คูปองที่อยู่ในกระเป๋า — ถอดแบบ "เผื่อมี" เท่านั้น ผิดพลาด/ไม่มี token ก็ถือว่าไม่ล็อกอิน
+function getOptionalUserId(req) {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (!token) return null;
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET).id;
+  } catch {
+    return null;
+  }
+}
 
 async function create(req, res, next) {
   try {
@@ -42,7 +56,7 @@ async function cancel(req, res, next) {
 
 async function validatePromo(req, res, next) {
   try {
-    const data = await orderService.validatePromo(req.body);
+    const data = await orderService.validatePromo(req.body, getOptionalUserId(req));
     res.json({ success: true, data });
   } catch (err) {
     next(err);

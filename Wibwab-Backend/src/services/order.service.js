@@ -6,7 +6,8 @@ const { httpError, isPositiveInt, isNonEmptyString } = require('../utils/validat
 
 // ── ตรวจโค้ดส่วนลด (ใช้ร่วมกันทั้ง validate-promo และตอนสร้างออเดอร์จริง) ──
 // conn = connection ใน transaction หรือ pool ปกติก็ได้
-async function checkPromo(conn, code, subtotal) {
+// userId = ผู้ใช้ที่กำลังตรวจโค้ด (อาจเป็น null ถ้ายังไม่ล็อกอิน) — ใช้เช็คสิทธิ์โค้ดที่ถูก push เข้ากระเป๋าใครไว้แล้ว
+async function checkPromo(conn, code, subtotal, userId) {
   const [rows] = await conn.execute('SELECT * FROM promo_codes WHERE code = ?', [code]);
   if (rows.length === 0) throw httpError(400, 'ไม่พบโค้ดส่วนลดนี้');
 
@@ -25,18 +26,34 @@ async function checkPromo(conn, code, subtotal) {
     );
   }
 
+  // โค้ดที่เคยถูก push เข้ากระเป๋าใครแล้ว (มีแถวใน user_coupons) ใช้ได้เฉพาะเจ้าของกระเป๋าเท่านั้น
+  // โค้ด public เดิมที่ไม่เคยถูก push ให้ใคร (ไม่มีแถวเลย) ยังพิมพ์ใช้ได้ทุกคนเหมือนเดิม
+  const [walletRows] = await conn.execute('SELECT id FROM user_coupons WHERE promo_code_id = ? LIMIT 1', [
+    promo.id,
+  ]);
+  let userCouponId = null;
+  if (walletRows.length > 0) {
+    if (!userId) throw httpError(401, 'กรุณาเข้าสู่ระบบก่อนใช้โค้ดนี้');
+    const [mine] = await conn.execute(
+      'SELECT id FROM user_coupons WHERE user_id = ? AND promo_code_id = ? AND is_used = FALSE',
+      [userId, promo.id]
+    );
+    if (mine.length === 0) throw httpError(400, 'โค้ดนี้ไม่ได้อยู่ในกระเป๋าคูปองของคุณ');
+    userCouponId = mine[0].id;
+  }
+
   const raw =
     promo.discount_type === 'percent'
       ? (Number(subtotal) * Number(promo.discount_value)) / 100
       : Number(promo.discount_value);
 
-  return { promo, discount: Math.min(raw, Number(subtotal)) };
+  return { promo, discount: Math.min(raw, Number(subtotal)), userCouponId };
 }
 
 // ส่วนขยายจากเอกสาร: ให้หน้า cart ตรวจโค้ดจริงก่อนสั่งซื้อ (แทน mock ฝั่ง frontend)
-async function validatePromo({ code, subtotal }) {
+async function validatePromo({ code, subtotal }, userId) {
   if (!isNonEmptyString(code)) throw httpError(400, 'กรุณาระบุโค้ดส่วนลด');
-  const { promo, discount } = await checkPromo(pool, code.trim().toUpperCase(), subtotal || 0);
+  const { promo, discount } = await checkPromo(pool, code.trim().toUpperCase(), subtotal || 0, userId);
   return {
     code: promo.code,
     discount_type: promo.discount_type,
@@ -105,10 +122,12 @@ async function createOrder(userId, body) {
     // 2) ตรวจโค้ดส่วนลด (ถ้ามี) — คำนวณยอดฝั่ง server เท่านั้น ไม่เชื่อตัวเลขจาก client
     let discount = 0;
     let promoId = null;
+    let userCouponId = null;
     if (promo_code) {
-      const result = await checkPromo(conn, String(promo_code).trim().toUpperCase(), subtotal);
+      const result = await checkPromo(conn, String(promo_code).trim().toUpperCase(), subtotal, userId);
       discount = result.discount;
       promoId = result.promo.id;
+      userCouponId = result.userCouponId;
       await conn.execute('UPDATE promo_codes SET used_count = used_count + 1 WHERE id = ?', [promoId]);
     }
     const total = subtotal - discount;
@@ -135,6 +154,14 @@ async function createOrder(userId, body) {
       ]
     );
     const orderId = orderResult.insertId;
+
+    // 3.5) โค้ดนี้มาจากกระเป๋าคูปองของลูกค้า (ไม่ใช่โค้ด public) → ปิดสิทธิ์ใช้ซ้ำ
+    if (userCouponId) {
+      await conn.execute(
+        'UPDATE user_coupons SET is_used = TRUE, used_order_id = ?, used_at = NOW() WHERE id = ?',
+        [orderId, userCouponId]
+      );
+    }
 
     // 4) บันทึกรายการสินค้า + ตัดสต็อก (WHERE stock_qty >= ? กันตัดติดลบอีกชั้น)
     for (const line of lines) {

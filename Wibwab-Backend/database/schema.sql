@@ -109,7 +109,9 @@ CREATE TABLE promo_codes (
   expires_at      DATETIME NULL,                     -- NULL = ไม่มีวันหมดอายุ
   usage_limit     INT NULL,                          -- NULL = ไม่จำกัดจำนวนครั้ง
   used_count      INT NOT NULL DEFAULT 0,
-  is_active       BOOLEAN NOT NULL DEFAULT TRUE
+  is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+  push_trigger    ENUM('manual','on_register') NOT NULL DEFAULT 'manual',  -- on_register = แจกอัตโนมัติตอนสมัครสมาชิก (Welcome Coupon)
+  label           VARCHAR(150) NULL  -- ชื่อแสดงผลในกระเป๋าคูปอง เช่น "ต้อนรับสมาชิกใหม่ 10%"
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
@@ -192,4 +194,23 @@ CREATE TABLE password_resets (
   used       BOOLEAN NOT NULL DEFAULT FALSE,  -- ใช้ได้ครั้งเดียว
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
+-- user_coupons — กระเป๋าคูปองลูกค้า (โค้ดที่ถูก push เข้าบัญชีลูกค้าคนใดคนหนึ่งโดยเฉพาะ)
+-- โค้ดที่มีแถวในตารางนี้ = ใช้ได้เฉพาะเจ้าของแถวเท่านั้น (ตรวจใน order.service.js:checkPromo)
+-- ส่วนโค้ด public เดิมที่ไม่เคยถูก push ให้ใคร ยังใช้ได้ทุกคนเหมือนเดิม
+-- ---------------------------------------------------------------------
+CREATE TABLE user_coupons (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  user_id       INT NOT NULL,
+  promo_code_id INT NOT NULL,
+  is_used       BOOLEAN NOT NULL DEFAULT FALSE,
+  used_order_id INT NULL,
+  assigned_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  used_at       DATETIME NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (promo_code_id) REFERENCES promo_codes(id) ON DELETE CASCADE,
+  FOREIGN KEY (used_order_id) REFERENCES orders(id) ON DELETE SET NULL,
+  UNIQUE KEY uq_user_promo (user_id, promo_code_id)  -- กันแจกโค้ดเดิมซ้ำให้คนเดิม (push ซ้ำ/welcome hook ซ้ำ)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

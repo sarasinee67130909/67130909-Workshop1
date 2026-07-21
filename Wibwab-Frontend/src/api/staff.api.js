@@ -79,3 +79,29 @@ export async function uploadProductImage(productId, file, isPrimary = false) {
   });
   return res.data;
 }
+
+// ── Coupons ──
+export async function getStaffPromos({ search, page } = {}) {
+  const res = await client.get('/api/staff/promos', { params: { search, page } });
+  return res.data;
+}
+
+export async function getStaffPromo(id) {
+  const res = await client.get(`/api/staff/promos/${id}`);
+  return res.data;
+}
+
+export async function createPromo(payload) {
+  const res = await client.post('/api/staff/promos', payload);
+  return res.data;
+}
+
+export async function updatePromo(id, payload) {
+  const res = await client.put(`/api/staff/promos/${id}`, payload);
+  return res.data;
+}
+
+export async function pushPromo(id) {
+  const res = await client.post(`/api/staff/promos/${id}/push`);
+  return res.data;
+}
