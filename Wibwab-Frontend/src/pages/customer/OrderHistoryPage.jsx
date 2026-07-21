@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
-import { getMyOrders } from '../../api/order.api';
+import { getMyOrders, cancelOrder, uploadSlip } from '../../api/order.api';
+import { createReview } from '../../api/review.api';
 import '../../styles/customer.css';
 
 // Map กลางสำหรับสถานะออเดอร์ (Single Source of Truth)
@@ -34,8 +35,10 @@ export default function OrderHistoryPage() {
   const [isMock, setIsMock] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
   const [reviewingItem, setReviewingItem] = useState(null); // { orderId, item }
+  const [slipTargetOrderId, setSlipTargetOrderId] = useState(null); // ออเดอร์ที่กำลังจะแนบสลิป
+  const slipInputRef = React.useRef(null);
 
-  useEffect(() => {
+  const fetchOrders = () => {
     setLoading(true);
     getMyOrders()
       .then((res) => {
@@ -46,18 +49,38 @@ export default function OrderHistoryPage() {
       })
       .catch((err) => console.error('Failed to fetch orders:', err))
       .finally(() => setLoading(false));
-  }, []);
+  };
 
-  const handleCancelOrder = (orderId) => {
-    if (window.confirm(`ต้องการยกเลิกคำสั่งซื้อ #${orderId} ใช่หรือไม่?`)) {
-      // TODO: เรียก API PUT /api/orders/:id/cancel เมื่อ Backend เสร็จ
-      alert(`(เดโม) ส่งคำขอยกเลิกคำสั่งซื้อ #${orderId} แล้ว`);
+  useEffect(fetchOrders, []);
+
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm(`ต้องการยกเลิกคำสั่งซื้อ #${orderId} ใช่หรือไม่?`)) return;
+    try {
+      await cancelOrder(orderId);
+      fetchOrders(); // โหลดสถานะล่าสุด (สต็อกถูกคืนแล้วฝั่ง server)
+    } catch (err) {
+      alert(err.response?.data?.message || 'ยกเลิกคำสั่งซื้อไม่สำเร็จ');
     }
   };
 
+  // กด "แนบสลิป" → เปิด file picker ของ input ที่ซ่อนไว้ (ตัวเดียวใช้ร่วมกันทุกออเดอร์)
   const handleUploadSlip = (orderId) => {
-    // TODO: เปิด Modal สำหรับอัปโหลดไฟล์ และเรียก POST /api/orders/:id/slip
-    alert(`(เดโม) เปิดหน้าต่างสำหรับแนบสลิปของคำสั่งซื้อ #${orderId}`);
+    setSlipTargetOrderId(orderId);
+    slipInputRef.current?.click();
+  };
+
+  const handleSlipFileChange = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = ''; // เคลียร์ค่า input ไว้เผื่อเลือกไฟล์เดิมซ้ำได้อีกครั้ง
+    if (!file || !slipTargetOrderId) return;
+    try {
+      await uploadSlip(slipTargetOrderId, file);
+      fetchOrders();
+    } catch (err) {
+      alert(err.response?.data?.message || 'แนบสลิปไม่สำเร็จ');
+    } finally {
+      setSlipTargetOrderId(null);
+    }
   };
 
   const filteredOrders =
@@ -154,6 +177,14 @@ export default function OrderHistoryPage() {
   return (
     <div className="customer-page">
       <Navbar />
+      {/* input ไฟล์ที่ซ่อนไว้ — ใช้ร่วมกันทุกปุ่ม "แนบสลิป" ในหน้านี้ */}
+      <input
+        type="file"
+        accept="image/*"
+        ref={slipInputRef}
+        onChange={handleSlipFileChange}
+        style={{ display: 'none' }}
+      />
       <main className="ohp-main">
         <div className="ohp-header">
           <h1>คำสั่งซื้อของฉัน</h1>
@@ -223,23 +254,31 @@ export default function OrderHistoryPage() {
 function ReviewModal({ orderId, item, onClose, onSuccess }) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (rating === 0) {
-      alert('กรุณาให้คะแนนสินค้า');
+      setError('กรุณาให้คะแนนสินค้า');
       return;
     }
-    // TODO: เรียก API POST /api/reviews เมื่อ Backend เสร็จ
-    // body: { product_id: item.product_id, order_id: orderId, rating, comment }
-    console.log('Submitting review:', {
-      orderId,
-      productId: item.product_id,
-      rating,
-      comment,
-    });
-    alert('(เดโม) ส่งรีวิวสำหรับสินค้าเรียบร้อยแล้ว ขอบคุณค่ะ!');
-    onSuccess();
+    setError('');
+    setSubmitting(true);
+    try {
+      await createReview({
+        product_id: item.product_id,
+        order_id: orderId,
+        rating,
+        comment,
+      });
+      alert('ส่งรีวิวสำหรับสินค้าเรียบร้อยแล้ว ขอบคุณค่ะ!');
+      onSuccess();
+    } catch (err) {
+      setError(err.response?.data?.message || 'ส่งรีวิวไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -285,9 +324,11 @@ function ReviewModal({ orderId, item, onClose, onSuccess }) {
             ></textarea>
           </div>
 
+          {error && <p className="chk-error-msg" style={{ textAlign: 'center', marginBottom: '8px' }}>{error}</p>}
+
           <div className="ohp-review-modal__footer">
-            <button type="submit" className="btn-cta">
-              ส่งรีวิว
+            <button type="submit" className="btn-cta" disabled={submitting}>
+              {submitting ? 'กำลังส่ง...' : 'ส่งรีวิว'}
             </button>
           </div>
         </form>

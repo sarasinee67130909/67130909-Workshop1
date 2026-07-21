@@ -72,3 +72,39 @@ export async function validatePromoCode({ code, subtotal }) {
   const res = await client.post('/api/orders/validate-promo', { code, subtotal });
   return res.data;
 }
+
+/**
+ * สร้างคำสั่งซื้อใหม่ (ตัดสต็อกฝั่ง server ใน transaction)
+ * @param {object} payload - { items:[{variant_id, quantity}], shipping_name, shipping_phone,
+ *   shipping_address, shipping_postal_code, promo_code, gift_wrap, gift_message }
+ * @returns {Promise<{success: boolean, data: {order_id, total_amount, status}, message?: string}>}
+ */
+export async function createOrder(payload) {
+  const res = await client.post('/api/orders', payload);
+  return res.data;
+}
+
+/**
+ * แนบสลิปโอนเงินให้คำสั่งซื้อ (เฉพาะสถานะรอชำระเงิน)
+ * @param {number} orderId
+ * @param {File} file
+ * @returns {Promise<{success: boolean, data: {order_id, slip_image}, message?: string}>}
+ */
+export async function uploadSlip(orderId, file) {
+  const formData = new FormData();
+  formData.append('slip', file);
+  const res = await client.post(`/api/orders/${orderId}/slip`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data;
+}
+
+/**
+ * ยกเลิกคำสั่งซื้อ (เฉพาะสถานะรอชำระเงิน — คืนสต็อกให้อัตโนมัติ)
+ * @param {number} orderId
+ * @returns {Promise<{success: boolean, data: {order_id, status}, message?: string}>}
+ */
+export async function cancelOrder(orderId) {
+  const res = await client.put(`/api/orders/${orderId}/cancel`);
+  return res.data;
+}

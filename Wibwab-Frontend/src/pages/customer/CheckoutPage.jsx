@@ -5,6 +5,7 @@ import { useCart } from '../../context/CartContext';
 import Footer from '../../components/common/Footer';
 import PromoCodeInput from '../../components/cart/PromoCodeInput';
 import GiftWrapOption from '../../components/cart/GiftWrapOption';
+import { createOrder, uploadSlip } from '../../api/order.api';
 
 // ฟอร์แมตราคาเป็นเงินบาท
 const formatTHB = (value) =>
@@ -30,6 +31,7 @@ export default function CheckoutPage() {
   const [slipPreview, setSlipPreview] = useState('');
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Guard: ถ้าตะกร้าว่าง ให้ redirect ไปหน้าสินค้า
   useEffect(() => {
@@ -65,27 +67,37 @@ export default function CheckoutPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    setSubmitError('');
     setIsSubmitting(true);
+    try {
+      // รวมที่อยู่เป็นบรรทัดเดียว ตรงกับที่ตาราง orders เก็บ shipping_address เป็น TEXT ก้อนเดียว
+      const shipping_address = `${shippingInfo.address} ต.${shippingInfo.subdistrict} อ.${shippingInfo.district} จ.${shippingInfo.province}`;
 
-    // TODO: เมื่อ Backend พร้อมแล้ว ให้เรียก API ที่นี่
-    // const formData = new FormData();
-    // formData.append('shipping_info', JSON.stringify(shippingInfo));
-    // formData.append('cart_items', JSON.stringify(items));
-    // formData.append('gift_wrap', isGift);
-    // formData.append('gift_message', giftMessage);
-    // formData.append('slip_image', paymentSlip);
-    // ...เรียก createOrder(formData)...
+      const orderRes = await createOrder({
+        items: items.map((it) => ({ variant_id: it.variantId, quantity: it.qty })),
+        shipping_name: shippingInfo.name,
+        shipping_phone: shippingInfo.phone,
+        shipping_address,
+        shipping_postal_code: shippingInfo.postalCode,
+        promo_code: promo?.code,
+        gift_wrap: isGift,
+        gift_message: isGift ? giftMessage : undefined,
+      });
 
-    // --- จำลองการทำงานสำเร็จ (ลบเมื่อเชื่อม Backend แล้ว) ---
-    setTimeout(() => {
-      alert('(เดโม) ได้รับคำสั่งซื้อเรียบร้อยแล้ว! ทีมงานจะตรวจสอบสลิปและอัปเดตสถานะให้ทราบ');
+      const orderId = orderRes.data.order_id;
+      await uploadSlip(orderId, paymentSlip);
+
       clearCart();
-      navigate('/'); // TODO: เปลี่ยนเป็น navigate ไปหน้าประวัติการสั่งซื้อ (/orders) เมื่อทำหน้านั้นเสร็จ
-    }, 800);
+      navigate('/orders');
+    } catch (err) {
+      setSubmitError(err.response?.data?.message || 'เกิดข้อผิดพลาดในการสั่งซื้อ กรุณาลองใหม่อีกครั้ง');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (items.length === 0) {
@@ -183,6 +195,8 @@ export default function CheckoutPage() {
                   )}
                 </div>
               </div>
+
+              {submitError && <p className="chk-error-msg chk-submit-error">{submitError}</p>}
 
               <div className="chk-actions">
                 <Link to="/cart" className="chk-back-link">

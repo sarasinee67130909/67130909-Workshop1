@@ -1899,6 +1899,12 @@
   margin-top: 4px;
 }
 
+.chk-submit-error {
+  font-size: 14px;
+  text-align: center;
+  margin: 16px 0 0;
+}
+
 /* ─── ส่วนฟอร์มด้านซ้าย ─── */
 .chk-section {
   margin-bottom: 32px;
