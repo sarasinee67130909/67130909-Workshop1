@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
 import SizeGuideModal from '../../components/product/SizeGuideModal';
-import { useAuth } from '../../context/AuthContext';
+import { useCustomerAuth as useAuth } from '../../context/CustomerAuthContext';
 import { updateProfile, changePassword } from '../../api/auth.api';
 import { getAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress } from '../../api/address.api';
 

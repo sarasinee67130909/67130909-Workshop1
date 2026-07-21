@@ -1,7 +1,7 @@
 // pages/admin/AdminLoginPage.jsx — หน้าเข้าสู่ระบบแอดมิน (โครงเดียวกับ StaffLoginPage ต่อ API จริงผ่าน AuthContext)
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAdminAuth as useAuth } from '../../context/AdminAuthContext';
 import '../../styles/admin.css';
 
 export default function AdminLoginPage() {

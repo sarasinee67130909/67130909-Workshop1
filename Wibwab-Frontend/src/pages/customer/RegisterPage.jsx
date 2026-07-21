@@ -1,7 +1,7 @@
 // pages/customer/RegisterPage.jsx — หน้าสมัครสมาชิก (แปลงจากดีไซน์ + ต่อ API จริง)
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useCustomerAuth as useAuth } from '../../context/CustomerAuthContext';
 
 const initialFormState = {
   full_name: '',

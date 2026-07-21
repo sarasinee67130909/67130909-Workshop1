@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAdminAuth as useAuth } from '../../context/AdminAuthContext';
 
 // เมนูฝั่งแอดมิน — เพิ่ม/ลด item ได้ตรงนี้ที่เดียว
 // หมายเหตุ: "โปรโมชัน" และ "พนักงาน" อยู่นอกขอบเขตของโปรเจกต์นี้ (ดู PROJECT_STRUCTURE.md ข้อ 10)

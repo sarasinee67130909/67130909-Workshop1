@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../context/AuthContext';
+import { useCustomerAuth as useAuth } from '../../context/CustomerAuthContext';
 
 // เมนูหมวดหมู่ — ค่า category ตรงกับ id ในตาราง categories (seed.sql)
 const NAV_LINKS = [

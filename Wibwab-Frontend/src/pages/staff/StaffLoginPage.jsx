@@ -1,7 +1,7 @@
 // pages/staff/StaffLoginPage.jsx — หน้าเข้าสู่ระบบพนักงาน (ต่อ API จริงผ่าน AuthContext)
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useStaffAuth as useAuth } from '../../context/StaffAuthContext';
 import '../../styles/staff.css';
 
 export default function StaffLoginPage() {

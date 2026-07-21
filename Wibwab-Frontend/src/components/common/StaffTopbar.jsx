@@ -1,6 +1,6 @@
 import { useState } from 'react';
 // TODO: ต่อกับ AuthContext จริง เพื่อดึงชื่อ/รูป staff ที่ login อยู่ และทำปุ่ม Sign out
-// import { useAuth } from '../../context/AuthContext';
+// import { useStaffAuth as useAuth } from '../../context/StaffAuthContext';
 
 /**
  * แถบด้านบนของ Staff Portal — มีช่องค้นหา, ปุ่มแจ้งเตือน/ช่วยเหลือ, และผู้ใช้ปัจจุบัน

@@ -1,7 +1,7 @@
 // pages/customer/LoginPage.jsx — หน้าเข้าสู่ระบบ (แปลงจากดีไซน์ + ต่อ API จริง)
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useCustomerAuth as useAuth } from '../../context/CustomerAuthContext';
 
 export default function LoginPage() {
   const { login, logout, isLoggedIn } = useAuth();
