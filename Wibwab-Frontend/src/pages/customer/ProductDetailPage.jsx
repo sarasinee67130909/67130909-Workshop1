@@ -7,6 +7,7 @@ import VariantSelector, { variantLabel } from '../../components/product/VariantS
 import SizeGuideModal from '../../components/product/SizeGuideModal';
 import { getProductById } from '../../api/product.api';
 import { useCart } from '../../context/CartContext';
+import { useFavorites } from '../../context/FavoritesContext';
 import '../../styles/customer.css';
 
 // ── ข้อมูลตัวอย่างไว้พรีวิวหน้า ระหว่าง Backend ยังไม่เสร็จ ──
@@ -62,6 +63,7 @@ const AccordionItem = ({ id, title, children }) => (
 export default function ProductDetailPage() {
   const { id } = useParams();
   const { addItem } = useCart();
+  const { isFavorited, toggleFavorite } = useFavorites();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -149,6 +151,7 @@ export default function ProductDetailPage() {
   const prices = product.variants.map((v) => v.price);
   const displayPrice = selectedVariant ? selectedVariant.price : Math.min(...prices);
   const canAddToBag = selectedVariant && selectedVariant.stock_qty > 0;
+  const favorited = isFavorited(product.id);
 
   return (
     <div className="pdp-page-container">
@@ -221,6 +224,21 @@ export default function ProductDetailPage() {
             <button className="btn-cta pdp-add-to-bag" disabled={!canAddToBag} onClick={handleAddToBag}>
               เพิ่มลงตะกร้า
               <span className="material-symbols-outlined">shopping_bag</span>
+            </button>
+            <button
+              type="button"
+              className={`btn-outline pdp-favorite-btn${favorited ? ' pdp-favorite-btn--active' : ''}`}
+              onClick={() =>
+                toggleFavorite({
+                  id: product.id,
+                  name: product.name,
+                  price: displayPrice,
+                  image_url: product.images[0],
+                })
+              }
+            >
+              <span className="material-symbols-outlined">{favorited ? 'favorite' : 'favorite_border'}</span>
+              {favorited ? 'บันทึกแล้ว' : 'บันทึกสินค้าโปรด'}
             </button>
             {!selectedVariant && (
               <p className="pdp-add-hint">กรุณาเลือกตัวเลือกสินค้าก่อนเพิ่มลงตะกร้า</p>

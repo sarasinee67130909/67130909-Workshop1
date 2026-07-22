@@ -8,6 +8,7 @@ const productRoutes = require('./routes/product.routes');
 const orderRoutes = require('./routes/order.routes');
 const reviewRoutes = require('./routes/review.routes');
 const addressRoutes = require('./routes/address.routes');
+const favoriteRoutes = require('./routes/favorite.routes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -24,6 +25,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/coupons', require('./routes/coupon.routes'));
+app.use('/api/favorites', favoriteRoutes);
 
 // TODO(Dev2): mount routes ฝั่งพนักงาน/แอดมินตรงนี้เมื่อพร้อม
 app.use('/api/staff', require('./routes/staff.routes'));

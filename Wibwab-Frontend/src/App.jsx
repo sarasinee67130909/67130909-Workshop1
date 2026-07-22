@@ -12,6 +12,7 @@ import ProfilePage from './pages/customer/ProfilePage';
 import ForgotPasswordPage from './pages/customer/ForgotPasswordPage';
 import ResetPasswordPage from './pages/customer/ResetPasswordPage';
 import MyCouponsPage from './pages/customer/MyCouponsPage';
+import FavoritesPage from './pages/customer/FavoritesPage';
 
 // ── ฝั่งพนักงาน (ธีม Teal) ──
 import StaffLayout from './components/common/StaffLayout';
@@ -86,6 +87,14 @@ function App() {
         element={
           <ProtectedRoute role="customer">
             <MyCouponsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/favorites"
+        element={
+          <ProtectedRoute role="customer">
+            <FavoritesPage />
           </ProtectedRoute>
         }
       />

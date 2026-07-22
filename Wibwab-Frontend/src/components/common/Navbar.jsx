@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useFavorites } from '../../context/FavoritesContext';
 import { useCustomerAuth as useAuth } from '../../context/CustomerAuthContext';
 
 // เมนูหมวดหมู่ — ค่า category ตรงกับ id ในตาราง categories (seed.sql)
@@ -17,6 +18,7 @@ const NAV_LINKS = [
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { itemCount } = useCart();
+  const { favorites } = useFavorites();
   const { isLoggedIn, user, logout } = useAuth();
 
   return (
@@ -57,6 +59,10 @@ function Navbar() {
         <div className="navbar-icons">
           <Link to="/products" aria-label="ค้นหาสินค้า">
             <span className="material-symbols-outlined">search</span>
+          </Link>
+          <Link to="/favorites" aria-label="สินค้าโปรด" className="navbar-favorites">
+            <span className="material-symbols-outlined">favorite</span>
+            {favorites.length > 0 && <span className="navbar-cart__badge">{favorites.length}</span>}
           </Link>
           <Link to="/cart" aria-label="ตะกร้าสินค้า" className="navbar-cart">
             <span className="material-symbols-outlined">shopping_bag</span>

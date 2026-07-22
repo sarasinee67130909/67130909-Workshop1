@@ -8,6 +8,7 @@ import { CustomerAuthProvider } from './context/CustomerAuthContext';
 import { StaffAuthProvider } from './context/StaffAuthContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import { CartProvider } from './context/CartContext';
+import { FavoritesProvider } from './context/FavoritesContext';
 import './styles/global.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -16,9 +17,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <CustomerAuthProvider>
         <StaffAuthProvider>
           <AdminAuthProvider>
-            <CartProvider>
-              <App />
-            </CartProvider>
+            <FavoritesProvider>
+              <CartProvider>
+                <App />
+              </CartProvider>
+            </FavoritesProvider>
           </AdminAuthProvider>
         </StaffAuthProvider>
       </CustomerAuthProvider>

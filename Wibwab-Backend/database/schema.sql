@@ -183,6 +183,20 @@ CREATE TABLE reviews (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
+-- favorites — สินค้าที่ลูกค้าบันทึกเป็นรายการโปรด (กดหัวใจในหน้าสินค้า)
+-- UNIQUE กันบันทึกสินค้าเดิมซ้ำ
+-- ---------------------------------------------------------------------
+CREATE TABLE favorites (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT NOT NULL,
+  product_id INT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_favorite_once (user_id, product_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
 -- password_resets — token สำหรับลืมรหัสผ่าน (§5.11)
 -- จำลองการส่งอีเมล: backend log ลิงก์ + ส่งกลับใน response แทนการส่งอีเมลจริง
 -- ---------------------------------------------------------------------

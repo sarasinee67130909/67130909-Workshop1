@@ -1,8 +1,12 @@
 // components/product/ProductCard.jsx — ชิ้นส่วน UI ฝั่งสินค้า (ยังไม่ implement)
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useFavorites } from '../../context/FavoritesContext';
 
 export default function ProductCard({ product }) {
+  const { isFavorited, toggleFavorite } = useFavorites();
+  const favorited = isFavorited(product.id);
+
   // ฟอร์แมตราคาเป็นเงินบาท (THB)
   const formattedPrice = new Intl.NumberFormat('th-TH', {
     style: 'currency',
@@ -13,14 +17,21 @@ export default function ProductCard({ product }) {
   return (
     <div className="product-card">
       <div className="product-card__image-wrap">
-        <img 
-          src={product.image_url || '/placeholder-image.jpg'} 
-          alt={product.name} 
+        <img
+          src={product.image_url || '/placeholder-image.jpg'}
+          alt={product.name}
           className="product-card__image"
         />
-        {/* ไอคอนหัวใจ (Wishlist - แสดงผลไว้ตามโจทย์) */}
-        <button className="product-card__wishlist" aria-label="Add to wishlist">
-          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>favorite</span>
+        {/* ไอคอนหัวใจ (Wishlist) */}
+        <button
+          type="button"
+          className={`product-card__wishlist${favorited ? ' product-card__wishlist--active' : ''}`}
+          aria-label={favorited ? 'นำออกจากรายการโปรด' : 'เพิ่มเข้ารายการโปรด'}
+          onClick={() => toggleFavorite(product)}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+            {favorited ? 'favorite' : 'favorite_border'}
+          </span>
         </button>
       </div>
       

@@ -749,6 +749,10 @@
   color: var(--rose-gold);
 }
 
+.product-card__wishlist--active {
+  color: var(--rose-gold);
+}
+
 .product-card__info {
   padding: 16px;
   text-align: center;
@@ -1273,6 +1277,21 @@
   color: var(--on-surface-variant);
   margin-top: 8px;
   text-align: center;
+}
+
+.pdp-favorite-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.pdp-favorite-btn--active {
+  background: var(--rose-gold);
+  color: #fff;
 }
 
 .pdp-shipping-info {
