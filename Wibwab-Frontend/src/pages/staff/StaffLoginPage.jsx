@@ -86,7 +86,12 @@ export default function StaffLoginPage() {
           </div>
 
           <div className="staff-form-group">
-            <label className="staff-form-label" htmlFor="password">รหัสผ่าน</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className="staff-form-label" htmlFor="password">รหัสผ่าน</label>
+              <Link to="/staff/forgot-password" style={{ fontSize: 13, color: 'var(--staff-primary)' }}>
+                ลืมรหัสผ่าน?
+              </Link>
+            </div>
             <input
               id="password"
               type="password"

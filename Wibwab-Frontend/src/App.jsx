@@ -17,6 +17,7 @@ import FavoritesPage from './pages/customer/FavoritesPage';
 // ── ฝั่งพนักงาน (ธีม Teal) ──
 import StaffLayout from './components/common/StaffLayout';
 import StaffLoginPage from './pages/staff/StaffLoginPage';
+import StaffForgotPasswordPage from './pages/staff/StaffForgotPasswordPage';
 import StaffDashboardPage from './pages/staff/StaffDashboardPage';
 import OrderManagePage from './pages/staff/OrderManagePage';
 import InventoryPage from './pages/staff/InventoryPage';
@@ -102,6 +103,7 @@ function App() {
 
       {/* ── ฝั่งพนักงาน (ธีม Teal) ── */}
       <Route path="/staff/login" element={<StaffLoginPage />} />
+      <Route path="/staff/forgot-password" element={<StaffForgotPasswordPage />} />
       <Route
         path="/staff"
         element={

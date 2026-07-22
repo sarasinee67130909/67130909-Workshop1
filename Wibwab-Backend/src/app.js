@@ -31,6 +31,7 @@ app.use('/api/favorites', favoriteRoutes);
 app.use('/api/staff', require('./routes/staff.routes'));
 app.use('/api/admin', require('./routes/admin.routes'));
 app.use('/api/admin-auth', require('./routes/adminAuth.routes'));
+app.use('/api/staff-auth', require('./routes/staffAuth.routes'));
 
 // หมายเหตุ: ไม่มี cart routes โดยดีไซน์ — ตะกร้าเก็บฝั่ง client (localStorage) ตาม §3
 
