@@ -1,7 +1,12 @@
 // components/common/AdminTopbar.jsx — แถบด้านบนของ Executive Suite
 // บัญชีแอดมินย้ายไปโชว์ที่แถบโลโก้บน Sidebar แล้ว (ดู AdminSidebar.jsx) — topbar นี้เหลือแค่แจ้งเตือนฝั่งขวา
 import NotificationBell from '../dashboard/NotificationBell';
-import { getAdminNotifications, markAdminNotificationRead, markAllAdminNotificationsRead } from '../../api/admin.api';
+import {
+  getAdminNotifications,
+  markAdminNotificationRead,
+  markAllAdminNotificationsRead,
+  deleteAdminNotification,
+} from '../../api/admin.api';
 
 // low_stock -> พาไปหน้ารายงานสต็อก พร้อม highlight ตัวเลือกสินค้านั้น
 // order_overdue -> ยังไม่มีหน้าจัดการออเดอร์ฝั่ง admin โดยตรง พาไปหน้า dashboard ภาพรวมแทน
@@ -26,6 +31,7 @@ export default function AdminTopbar() {
           getNotifications={getAdminNotifications}
           markRead={markAdminNotificationRead}
           markAllRead={markAllAdminNotificationsRead}
+          deleteNotification={deleteAdminNotification}
           resolveLink={resolveAdminLink}
         />
       </div>

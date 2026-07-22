@@ -166,6 +166,15 @@ async function markAllNotificationsRead(req, res, next) {
   }
 }
 
+async function deleteNotification(req, res, next) {
+  try {
+    const data = await notificationService.deleteNotification(req.params.id);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   dashboard,
   dashboardExport,
@@ -178,4 +187,5 @@ module.exports = {
   listNotifications,
   markNotificationRead,
   markAllNotificationsRead,
+  deleteNotification,
 };

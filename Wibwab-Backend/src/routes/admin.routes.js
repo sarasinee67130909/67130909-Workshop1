@@ -25,5 +25,6 @@ router.get('/reports/profit/export', adminController.profitReportExport);
 router.get('/notifications', adminController.listNotifications);
 router.put('/notifications/:id/read', adminController.markNotificationRead);
 router.put('/notifications/read-all', adminController.markAllNotificationsRead);
+router.delete('/notifications/:id', adminController.deleteNotification);
 
 module.exports = router;

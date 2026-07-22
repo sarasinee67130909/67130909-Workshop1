@@ -102,3 +102,8 @@ export async function markAllAdminNotificationsRead() {
   const res = await client.put('/api/admin/notifications/read-all');
   return res.data;
 }
+
+export async function deleteAdminNotification(id) {
+  const res = await client.delete(`/api/admin/notifications/${id}`);
+  return res.data;
+}
