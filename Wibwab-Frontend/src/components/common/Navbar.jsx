@@ -1,6 +1,6 @@
 // components/common/Navbar.jsx — แถบนำทางหลักฝั่งลูกค้า (sticky + เมนูมือถือ + badge ตะกร้า + สถานะล็อกอิน)
 import { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { useCustomerAuth as useAuth } from '../../context/CustomerAuthContext';
@@ -17,9 +17,22 @@ const NAV_LINKS = [
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const navigate = useNavigate();
   const { itemCount } = useCart();
   const { favorites } = useFavorites();
   const { isLoggedIn, user, logout } = useAuth();
+
+  // ค้นหาสินค้า — ส่งไปหน้ารายการสินค้าพร้อมคำค้นใน query string (?q=...)
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const trimmed = searchValue.trim();
+    if (!trimmed) return;
+    navigate(`/products?q=${encodeURIComponent(trimmed)}`);
+    setSearchOpen(false);
+    setSearchValue('');
+  };
 
   return (
     <header className="navbar">
@@ -57,9 +70,26 @@ function Navbar() {
         </nav>
 
         <div className="navbar-icons">
-          <Link to="/products" aria-label="ค้นหาสินค้า">
-            <span className="material-symbols-outlined">search</span>
-          </Link>
+          <div className="navbar-search">
+            <button
+              type="button"
+              aria-label="ค้นหาสินค้า"
+              onClick={() => setSearchOpen((open) => !open)}
+            >
+              <span className="material-symbols-outlined">search</span>
+            </button>
+            {searchOpen && (
+              <form className="navbar-search__form" onSubmit={handleSearchSubmit}>
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="ค้นหาสินค้า..."
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                />
+              </form>
+            )}
+          </div>
           <Link to="/favorites" aria-label="สินค้าโปรด" className="navbar-favorites">
             <span className="material-symbols-outlined">favorite</span>
             {favorites.length > 0 && <span className="navbar-cart__badge">{favorites.length}</span>}

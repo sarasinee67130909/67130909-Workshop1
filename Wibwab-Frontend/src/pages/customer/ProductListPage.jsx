@@ -1,6 +1,6 @@
 // pages/customer/ProductListPage.jsx — หน้ารายการสินค้า + ตัวกรอง (ธีม Rose Gold)
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
 import FilterSidebar from '../../components/product/FilterSidebar';
@@ -23,13 +23,19 @@ export default function ProductListPage() {
     minPrice: '',
     maxPrice: '',
     size: '',
+    keyword: searchParams.get('q') || '',
     page: 1
   });
 
-  // ถ้า URL เปลี่ยนระหว่างอยู่หน้านี้ (เช่น กดหมวดอื่นใน Navbar) ให้ sync ลง filter
+  // ถ้า URL เปลี่ยนระหว่างอยู่หน้านี้ (เช่น กดหมวดอื่นใน Navbar หรือค้นหาซ้ำ) ให้ sync ลง filter
   useEffect(() => {
     const cat = searchParams.get('category') || '';
-    setFilters(prev => (prev.category === cat ? prev : { ...prev, category: cat, page: 1 }));
+    const keyword = searchParams.get('q') || '';
+    setFilters(prev =>
+      prev.category === cat && prev.keyword === keyword
+        ? prev
+        : { ...prev, category: cat, keyword, page: 1 }
+    );
   }, [searchParams]);
 
   // ใช้ useEffect เพื่อเรียก API เมื่อตัวกรองหรือหน้าเปลี่ยน
@@ -69,9 +75,15 @@ export default function ProductListPage() {
       <main className="product-page">
         <div className="product-page__header">
           <h1 className="product-page__title">คอลเลกชันเครื่องประดับ</h1>
-          <p className="product-page__subtitle">
-            ค้นพบเครื่องประดับที่บ่งบอกความเป็นคุณ ผ่านคอลเลกชันที่ดีที่สุดของเรา
-          </p>
+          {filters.keyword ? (
+            <p className="product-page__subtitle">
+              ผลการค้นหา: "{filters.keyword}" — <Link to="/products">ล้างการค้นหา</Link>
+            </p>
+          ) : (
+            <p className="product-page__subtitle">
+              ค้นพบเครื่องประดับที่บ่งบอกความเป็นคุณ ผ่านคอลเลกชันที่ดีที่สุดของเรา
+            </p>
+          )}
         </div>
 
         <div className="product-page__layout">

@@ -29,6 +29,10 @@ async function getProducts(filters = {}) {
     where.push('v.price <= ?');
     params.push(Number(filters.maxPrice));
   }
+  if (filters.keyword) {
+    where.push('p.name LIKE ?');
+    params.push(`%${filters.keyword}%`);
+  }
 
   const whereSql = where.join(' AND ');
 

@@ -14,6 +14,7 @@ export const getProducts = async (filters = {}) => {
     if (filters.minPrice) params.minPrice = filters.minPrice;
     if (filters.maxPrice) params.maxPrice = filters.maxPrice;
     if (filters.size) params.size = filters.size;
+    if (filters.keyword) params.keyword = filters.keyword;
     if (filters.page) params.page = filters.page;
 
     const response = await apiClient.get('/api/products', { params });
