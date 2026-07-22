@@ -79,7 +79,7 @@ export default function OrderManagePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, page]);
 
-  // แนะนำชื่อลูกค้าที่ใกล้เคียงระหว่างพิมพ์ (debounce กันยิง request ทุกตัวอักษร)
+  // แนะนำชื่อลูกค้า/เลขออเดอร์ที่ใกล้เคียงระหว่างพิมพ์ (debounce กันยิง request ทุกตัวอักษร)
   useEffect(() => {
     if (!search.trim()) {
       setSuggestions([]);
@@ -88,8 +88,21 @@ export default function OrderManagePage() {
     const timer = setTimeout(() => {
       getStaffOrders({ search: search.trim(), page: 1 }).then((res) => {
         if (!res.success) return;
-        const names = [...new Set(res.data.items.map((o) => o.customer).filter(Boolean))];
-        setSuggestions(names.slice(0, 6));
+        // แต่ละออเดอร์ที่เจอ ให้ตัวเลือกทั้งเลขออเดอร์และชื่อลูกค้า — พิมพ์ตัวเลขก็เจอ #ORD-xxxx ให้กดเลือกได้
+        const seen = new Set();
+        const items = [];
+        for (const o of res.data.items) {
+          const orderValue = String(o.id);
+          if (!seen.has(orderValue)) {
+            seen.add(orderValue);
+            items.push({ label: `#ORD-${String(o.id).padStart(4, '0')} · ${o.customer}`, value: orderValue });
+          }
+          if (o.customer && !seen.has(o.customer)) {
+            seen.add(o.customer);
+            items.push({ label: o.customer, value: o.customer });
+          }
+        }
+        setSuggestions(items.slice(0, 6));
       });
     }, 300);
     return () => clearTimeout(timer);
@@ -104,11 +117,11 @@ export default function OrderManagePage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showSuggestions]);
 
-  function selectSuggestion(name) {
-    setSearch(name);
+  function selectSuggestion(suggestion) {
+    setSearch(suggestion.value);
     setShowSuggestions(false);
     setPage(1);
-    loadOrders({ search: name, page: 1 });
+    loadOrders({ search: suggestion.value, page: 1 });
   }
 
   // มาจากคลิกแจ้งเตือนที่กระดิ่ง (StaffTopbar ส่ง state.openOrderId มาทาง navigate) — เปิดออเดอร์นั้นให้ทันที
@@ -230,10 +243,10 @@ export default function OrderManagePage() {
             />
             {showSuggestions && suggestions.length > 0 && (
               <ul className="staff-search__suggestions">
-                {suggestions.map((name) => (
-                  <li key={name}>
-                    <button type="button" onMouseDown={() => selectSuggestion(name)}>
-                      {name}
+                {suggestions.map((s) => (
+                  <li key={s.value}>
+                    <button type="button" onMouseDown={() => selectSuggestion(s)}>
+                      {s.label}
                     </button>
                   </li>
                 ))}
