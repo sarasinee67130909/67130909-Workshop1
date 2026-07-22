@@ -4,7 +4,7 @@ const pool = require('../config/db');
 const { httpError, isPositiveInt } = require('../utils/validators');
 const stockService = require('./stock.service');
 
-const DASHBOARD_RANGE_DAYS = { '7d': 7, '30d': 30 };
+const DASHBOARD_RANGE_DAYS = { '1d': 1, '7d': 7, '30d': 30 };
 
 // ── Helpers วันที่/เดือน ──
 function toDateStr(d) {
