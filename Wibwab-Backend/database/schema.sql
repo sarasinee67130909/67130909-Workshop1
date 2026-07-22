@@ -214,3 +214,17 @@ CREATE TABLE user_coupons (
   FOREIGN KEY (used_order_id) REFERENCES orders(id) ON DELETE SET NULL,
   UNIQUE KEY uq_user_promo (user_id, promo_code_id)  -- กันแจกโค้ดเดิมซ้ำให้คนเดิม (push ซ้ำ/welcome hook ซ้ำ)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
+-- notifications — กระดิ่งแจ้งเตือนฝั่ง staff/admin เมื่อลูกค้าทำรายการต่างๆ
+-- เป็น inbox กลางที่ staff ทุกคนเห็นร่วมกัน (ไม่ผูกกับ staff คนใดคนหนึ่ง) — เรียบง่ายพอสำหรับสเกลโปรเจกต์นี้
+-- ---------------------------------------------------------------------
+CREATE TABLE notifications (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  type       ENUM('new_order','slip_uploaded','order_cancelled','new_review') NOT NULL,
+  message    VARCHAR(255) NOT NULL,
+  order_id   INT NULL,
+  is_read    BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

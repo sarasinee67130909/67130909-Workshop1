@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import StatusBadge from '../../components/dashboard/StatusBadge';
 import Pagination from '../../components/dashboard/Pagination';
 import Modal from '../../components/common/Modal';
@@ -39,6 +40,9 @@ function initialsOf(name) {
 }
 
 export default function OrderManagePage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [orders, setOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
@@ -46,15 +50,22 @@ export default function OrderManagePage() {
   const [meta, setMeta] = useState({ total: 0, totalPages: 1, pageSize: 10 });
   const [loading, setLoading] = useState(true);
 
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchBoxRef = useRef(null);
+
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [actionError, setActionError] = useState('');
   const [tracking, setTracking] = useState('');
   const [busy, setBusy] = useState(false);
 
-  function loadOrders() {
+  // overrides ใช้ตอนอยากยิง request ทันทีด้วยค่าใหม่ โดยไม่รอ state อัปเดตก่อน (เช่น คลิกตัวเลือกที่แนะนำ)
+  function loadOrders(overrides = {}) {
+    const searchTerm = overrides.search !== undefined ? overrides.search : search;
+    const pageNum = overrides.page !== undefined ? overrides.page : page;
     setLoading(true);
-    getStaffOrders({ status: statusFilter || undefined, search: search || undefined, page })
+    getStaffOrders({ status: statusFilter || undefined, search: searchTerm || undefined, page: pageNum })
       .then((res) => {
         if (!res.success) return;
         setOrders(res.data.items);
@@ -67,6 +78,47 @@ export default function OrderManagePage() {
     loadOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, page]);
+
+  // แนะนำชื่อลูกค้าที่ใกล้เคียงระหว่างพิมพ์ (debounce กันยิง request ทุกตัวอักษร)
+  useEffect(() => {
+    if (!search.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(() => {
+      getStaffOrders({ search: search.trim(), page: 1 }).then((res) => {
+        if (!res.success) return;
+        const names = [...new Set(res.data.items.map((o) => o.customer).filter(Boolean))];
+        setSuggestions(names.slice(0, 6));
+      });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    if (!showSuggestions) return;
+    function handleClickOutside(e) {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(e.target)) setShowSuggestions(false);
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSuggestions]);
+
+  function selectSuggestion(name) {
+    setSearch(name);
+    setShowSuggestions(false);
+    setPage(1);
+    loadOrders({ search: name, page: 1 });
+  }
+
+  // มาจากคลิกแจ้งเตือนที่กระดิ่ง (StaffTopbar ส่ง state.openOrderId มาทาง navigate) — เปิดออเดอร์นั้นให้ทันที
+  useEffect(() => {
+    if (location.state?.openOrderId) {
+      openOrder(location.state.openOrderId);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
 
   function openOrder(orderId) {
     setActionError('');
@@ -156,21 +208,37 @@ export default function OrderManagePage() {
             ))}
           </select>
 
-          <div className="staff-input" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div className="staff-input staff-search" ref={searchBoxRef} style={{ display: 'flex', alignItems: 'center', gap: 8, position: 'relative' }}>
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>search</span>
             <input
               type="text"
               placeholder="ค้นหาชื่อลูกค้า / รหัสคำสั่งซื้อ"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
+                  setShowSuggestions(false);
                   setPage(1);
-                  loadOrders();
+                  loadOrders({ page: 1 });
                 }
               }}
               style={{ border: 'none', outline: 'none', width: 220 }}
             />
+            {showSuggestions && suggestions.length > 0 && (
+              <ul className="staff-search__suggestions">
+                {suggestions.map((name) => (
+                  <li key={name}>
+                    <button type="button" onMouseDown={() => selectSuggestion(name)}>
+                      {name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>

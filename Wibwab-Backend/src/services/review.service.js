@@ -2,6 +2,8 @@
 const pool = require('../config/db');
 const { ORDER_STATUS } = require('../utils/orderStatus');
 const { httpError, isPositiveInt } = require('../utils/validators');
+const { NOTIFICATION_TYPE } = require('../utils/notificationType');
+const notificationService = require('./notification.service');
 
 async function createReview(userId, { product_id, order_id, rating, comment }) {
   if (!isPositiveInt(product_id) || !isPositiveInt(order_id)) {
@@ -14,10 +16,11 @@ async function createReview(userId, { product_id, order_id, rating, comment }) {
 
   // เงื่อนไขตามกติกา: ต้องเป็นออเดอร์ของตัวเอง สถานะ delivered และมีสินค้าชิ้นนี้อยู่ในออเดอร์จริง
   const [rows] = await pool.execute(
-    `SELECT o.id
+    `SELECT o.id, o.shipping_name, p.name AS product_name
        FROM orders o
        JOIN order_items oi ON oi.order_id = o.id
        JOIN product_variants v ON v.id = oi.variant_id
+       JOIN products p ON p.id = v.product_id
       WHERE o.id = ? AND o.user_id = ? AND o.status = ? AND v.product_id = ?
       LIMIT 1`,
     [order_id, userId, ORDER_STATUS.DELIVERED, product_id]
@@ -31,6 +34,15 @@ async function createReview(userId, { product_id, order_id, rating, comment }) {
       'INSERT INTO reviews (user_id, product_id, order_id, rating, comment) VALUES (?, ?, ?, ?, ?)',
       [userId, product_id, order_id, score, comment || null]
     );
+
+    notificationService
+      .createNotification({
+        type: NOTIFICATION_TYPE.NEW_REVIEW,
+        message: `${rows[0].shipping_name} รีวิวสินค้า "${rows[0].product_name}" (${score} ดาว)`,
+        order_id: Number(order_id),
+      })
+      .catch((err) => console.error('สร้างการแจ้งเตือน staff ไม่สำเร็จ:', err));
+
     return { id: result.insertId, product_id: Number(product_id), rating: score };
   } catch (err) {
     // UNIQUE (user_id, product_id, order_id) ใน schema กันรีวิวซ้ำ

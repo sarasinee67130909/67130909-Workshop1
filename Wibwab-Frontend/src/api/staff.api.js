@@ -105,3 +105,19 @@ export async function pushPromo(id) {
   const res = await client.post(`/api/staff/promos/${id}/push`);
   return res.data;
 }
+
+// ── Notifications ──
+export async function getStaffNotifications() {
+  const res = await client.get('/api/staff/notifications');
+  return res.data;
+}
+
+export async function markNotificationRead(id) {
+  const res = await client.put(`/api/staff/notifications/${id}/read`);
+  return res.data;
+}
+
+export async function markAllNotificationsRead() {
+  const res = await client.put('/api/staff/notifications/read-all');
+  return res.data;
+}

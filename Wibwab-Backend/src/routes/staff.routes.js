@@ -37,4 +37,9 @@ router.post('/promos', staffController.createPromo);
 router.put('/promos/:id', staffController.updatePromo);
 router.post('/promos/:id/push', staffController.pushPromo);
 
+// ── Notifications ──
+router.get('/notifications', staffController.listNotifications);
+router.put('/notifications/:id/read', staffController.markNotificationRead);
+router.put('/notifications/read-all', staffController.markAllNotificationsRead);
+
 module.exports = router;

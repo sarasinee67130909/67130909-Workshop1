@@ -3,6 +3,15 @@
 const pool = require('../config/db');
 const { ORDER_STATUS } = require('../utils/orderStatus');
 const { httpError, isPositiveInt, isNonEmptyString } = require('../utils/validators');
+const { NOTIFICATION_TYPE } = require('../utils/notificationType');
+const notificationService = require('./notification.service');
+
+// แจ้งเตือน staff แบบ fire-and-forget — พลาดได้โดยไม่กระทบ flow หลักของลูกค้า
+function notifyStaff(payload) {
+  notificationService.createNotification(payload).catch((err) => {
+    console.error('สร้างการแจ้งเตือน staff ไม่สำเร็จ:', err);
+  });
+}
 
 // ── ตรวจโค้ดส่วนลด (ใช้ร่วมกันทั้ง validate-promo และตอนสร้างออเดอร์จริง) ──
 // conn = connection ใน transaction หรือ pool ปกติก็ได้
@@ -180,6 +189,13 @@ async function createOrder(userId, body) {
 
     // สำเร็จครบทุกขั้น → commit / ถ้าพลาดข้อใดข้อหนึ่ง catch ด้านล่างจะ rollback ทั้งหมด
     await conn.commit();
+
+    notifyStaff({
+      type: NOTIFICATION_TYPE.NEW_ORDER,
+      message: `${shipping_name} สร้างคำสั่งซื้อใหม่ #ORD-${String(orderId).padStart(4, '0')}`,
+      order_id: orderId,
+    });
+
     return {
       order_id: orderId,
       subtotal,
@@ -247,7 +263,7 @@ async function getMyOrders(userId) {
 
 // ── แนบสลิปโอนเงิน (เจ้าของออเดอร์ + สถานะรอชำระเท่านั้น) ──
 async function attachSlip(userId, orderId, filePath) {
-  const [rows] = await pool.execute('SELECT user_id, status FROM orders WHERE id = ?', [orderId]);
+  const [rows] = await pool.execute('SELECT user_id, status, shipping_name FROM orders WHERE id = ?', [orderId]);
   if (rows.length === 0) throw httpError(404, 'ไม่พบคำสั่งซื้อ');
   if (rows[0].user_id !== userId) throw httpError(403, 'ไม่ใช่คำสั่งซื้อของคุณ');
   if (rows[0].status !== ORDER_STATUS.PENDING_PAYMENT) {
@@ -255,6 +271,13 @@ async function attachSlip(userId, orderId, filePath) {
   }
 
   await pool.execute('UPDATE orders SET slip_image = ? WHERE id = ?', [filePath, orderId]);
+
+  notifyStaff({
+    type: NOTIFICATION_TYPE.SLIP_UPLOADED,
+    message: `${rows[0].shipping_name} แนบสลิปโอนเงินสำหรับคำสั่งซื้อ #ORD-${String(orderId).padStart(4, '0')}`,
+    order_id: Number(orderId),
+  });
+
   return { order_id: Number(orderId), slip_image: filePath };
 }
 
@@ -264,7 +287,7 @@ async function cancelOrder(userId, orderId) {
   try {
     await conn.beginTransaction();
 
-    const [rows] = await conn.execute('SELECT user_id, status FROM orders WHERE id = ? FOR UPDATE', [orderId]);
+    const [rows] = await conn.execute('SELECT user_id, status, shipping_name FROM orders WHERE id = ? FOR UPDATE', [orderId]);
     if (rows.length === 0) throw httpError(404, 'ไม่พบคำสั่งซื้อ');
     if (rows[0].user_id !== userId) throw httpError(403, 'ไม่ใช่คำสั่งซื้อของคุณ');
     if (rows[0].status !== ORDER_STATUS.PENDING_PAYMENT) {
@@ -285,6 +308,13 @@ async function cancelOrder(userId, orderId) {
 
     await conn.execute('UPDATE orders SET status = ? WHERE id = ?', [ORDER_STATUS.CANCELLED, orderId]);
     await conn.commit();
+
+    notifyStaff({
+      type: NOTIFICATION_TYPE.ORDER_CANCELLED,
+      message: `${rows[0].shipping_name} ยกเลิกคำสั่งซื้อ #ORD-${String(orderId).padStart(4, '0')}`,
+      order_id: Number(orderId),
+    });
+
     return { order_id: Number(orderId), status: ORDER_STATUS.CANCELLED };
   } catch (err) {
     await conn.rollback();

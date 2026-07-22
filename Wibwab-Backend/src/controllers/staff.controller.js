@@ -1,6 +1,7 @@
 // controllers/staff.controller.js — รับ req → เรียก service → ส่ง response
 const staffService = require('../services/staff.service');
 const couponService = require('../services/coupon.service');
+const notificationService = require('../services/notification.service');
 const { httpError } = require('../utils/validators');
 
 // ── Dashboard ──
@@ -186,6 +187,34 @@ async function pushPromo(req, res, next) {
   }
 }
 
+// ── Notifications ──
+async function listNotifications(req, res, next) {
+  try {
+    const data = await notificationService.listNotifications();
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function markNotificationRead(req, res, next) {
+  try {
+    const data = await notificationService.markRead(req.params.id);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function markAllNotificationsRead(req, res, next) {
+  try {
+    const data = await notificationService.markAllRead();
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   dashboard,
   listOrders,
@@ -206,4 +235,7 @@ module.exports = {
   createPromo,
   updatePromo,
   pushPromo,
+  listNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
 };
