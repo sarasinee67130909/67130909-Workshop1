@@ -199,11 +199,11 @@ export default function InventoryPage() {
                           )}
                         </td>
                         <td>
-                          <div className={`staff-stepper${variant.stock === 0 ? ' staff-stepper--disabled' : ''}`}>
+                          <div className="staff-stepper">
                             <button
                               onClick={() => adjustStock(cIdx, vIdx, -1)}
                               aria-label="ลดสต็อก"
-                              disabled={pendingSaves[variant.id]}
+                              disabled={pendingSaves[variant.id] || variant.stock === 0}
                             >
                               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>remove</span>
                             </button>
