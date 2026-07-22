@@ -1,5 +1,10 @@
 import NotificationBell from '../dashboard/NotificationBell';
-import { getStaffNotifications, markNotificationRead, markAllNotificationsRead } from '../../api/staff.api';
+import {
+  getStaffNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+  deleteNotification,
+} from '../../api/staff.api';
 
 // แจ้งเตือนของ staff ทุกประเภทผูกกับออเดอร์ (order_id) — คลิกแล้วพาไปเปิดออเดอร์นั้นที่หน้าคำสั่งซื้อ
 function resolveStaffLink(notif) {
@@ -29,6 +34,7 @@ export default function StaffTopbar() {
           getNotifications={getStaffNotifications}
           markRead={markNotificationRead}
           markAllRead={markAllNotificationsRead}
+          deleteNotification={deleteNotification}
           resolveLink={resolveStaffLink}
         />
 

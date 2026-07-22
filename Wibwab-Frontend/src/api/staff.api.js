@@ -121,3 +121,8 @@ export async function markAllNotificationsRead() {
   const res = await client.put('/api/staff/notifications/read-all');
   return res.data;
 }
+
+export async function deleteNotification(id) {
+  const res = await client.delete(`/api/staff/notifications/${id}`);
+  return res.data;
+}

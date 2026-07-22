@@ -41,5 +41,6 @@ router.post('/promos/:id/push', staffController.pushPromo);
 router.get('/notifications', staffController.listNotifications);
 router.put('/notifications/:id/read', staffController.markNotificationRead);
 router.put('/notifications/read-all', staffController.markAllNotificationsRead);
+router.delete('/notifications/:id', staffController.deleteNotification);
 
 module.exports = router;

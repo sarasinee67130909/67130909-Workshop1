@@ -22,6 +22,7 @@ function timeAgo(iso) {
  *   getNotifications     - () => Promise<{success, data: {items, unread_count}}>
  *   markRead             - (id) => Promise
  *   markAllRead          - () => Promise
+ *   deleteNotification   - (id) => Promise (optional — ไม่ส่ง prop นี้มา = ไม่แสดงปุ่มลบ)
  *   resolveLink          - (notif) => { to, state } | null — ปลายทางตอนคลิกแจ้งเตือน (null = ไม่ต้องนำทาง)
  */
 export default function NotificationBell({
@@ -30,6 +31,7 @@ export default function NotificationBell({
   getNotifications,
   markRead,
   markAllRead,
+  deleteNotification,
   resolveLink,
 }) {
   const navigate = useNavigate();
@@ -82,6 +84,13 @@ export default function NotificationBell({
     setUnreadCount(0);
   }
 
+  function handleDelete(notif) {
+    if (!window.confirm('ยืนยันลบการแจ้งเตือนนี้? เมื่อลบแล้วจะไม่สามารถกู้คืนได้')) return;
+    deleteNotification(notif.id).catch(() => {});
+    setNotifications((prev) => prev.filter((n) => n.id !== notif.id));
+    if (!notif.is_read) setUnreadCount((c) => Math.max(0, c - 1));
+  }
+
   return (
     <div className={`${classPrefix}-notif`} ref={panelRef}>
       <button className={`${classPrefix}-icon-btn`} aria-label="การแจ้งเตือน" onClick={() => setOpen((v) => !v)}>
@@ -104,14 +113,29 @@ export default function NotificationBell({
               <p className={`${classPrefix}-notif__empty`}>ยังไม่มีการแจ้งเตือน</p>
             )}
             {notifications.map((notif) => (
-              <button
+              <div
                 key={notif.id}
                 className={`${classPrefix}-notif__item${notif.is_read ? '' : ` ${classPrefix}-notif__item--unread`}`}
-                onClick={() => handleItemClick(notif)}
               >
-                <span className={`${classPrefix}-notif__message`}>{notif.message}</span>
-                <span className={`${classPrefix}-notif__time`}>{timeAgo(notif.created_at)}</span>
-              </button>
+                <button
+                  type="button"
+                  className={`${classPrefix}-notif__item-main`}
+                  onClick={() => handleItemClick(notif)}
+                >
+                  <span className={`${classPrefix}-notif__message`}>{notif.message}</span>
+                  <span className={`${classPrefix}-notif__time`}>{timeAgo(notif.created_at)}</span>
+                </button>
+                {deleteNotification && (
+                  <button
+                    type="button"
+                    className={`${classPrefix}-notif__delete`}
+                    aria-label="ลบการแจ้งเตือน"
+                    onClick={() => handleDelete(notif)}
+                  >
+                    <span className="material-symbols-outlined">delete</span>
+                  </button>
+                )}
+              </div>
             ))}
           </div>
         </div>

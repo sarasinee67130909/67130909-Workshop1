@@ -95,6 +95,12 @@ async function markAllRead(types) {
   return { message: 'อ่านการแจ้งเตือนทั้งหมดแล้ว' };
 }
 
+async function deleteNotification(id) {
+  const [result] = await pool.execute('DELETE FROM notifications WHERE id = ?', [id]);
+  if (result.affectedRows === 0) throw httpError(404, 'ไม่พบการแจ้งเตือนนี้');
+  return { id: Number(id) };
+}
+
 module.exports = {
   createNotification,
   notifyLowStock,
@@ -102,4 +108,5 @@ module.exports = {
   listNotifications,
   markRead,
   markAllRead,
+  deleteNotification,
 };
