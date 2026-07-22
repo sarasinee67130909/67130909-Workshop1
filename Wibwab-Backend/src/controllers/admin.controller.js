@@ -21,6 +21,22 @@ function resolveFormat(req) {
   return format;
 }
 
+// ป้ายกำกับช่วงเวลาของรายงานสต็อก — ข้อมูลด้านในยังเป็น snapshot ปัจจุบันเสมอ (ระบบไม่ได้เก็บประวัติสต็อกย้อนหลัง)
+// เลือก "รายวัน/รายสัปดาห์" ตรงนี้แค่เปลี่ยนหัวข้อรายงานเพื่อให้ระบุช่วงเวลาที่พิมพ์รายงานชัดเจน
+function stockPeriodLabel(period) {
+  const now = new Date();
+  if (period === 'weekly') {
+    const day = now.getDay(); // 0=อาทิตย์..6=เสาร์
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + (day === 0 ? -6 : 1 - day));
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const fmt = (d) => d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+    return `ประจำสัปดาห์ที่ ${fmt(monday)} – ${fmt(sunday)}`;
+  }
+  return `ประจำวันที่ ${now.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+}
+
 
 // GET /api/admin/dashboard?range=7d|30d
 async function dashboard(req, res, next) {
@@ -103,14 +119,16 @@ async function salesReportExport(req, res, next) {
 async function stockReportExport(req, res, next) {
   try {
     const format = resolveFormat(req);
+    const period = req.query.period === 'weekly' ? 'weekly' : 'daily';
+    const periodLabel = stockPeriodLabel(period);
     const data = await reportService.getStockReport();
     const today = new Date().toISOString().slice(0, 10);
-    const filename = `stock-report_${today}.${format}`;
+    const filename = `stock-report_${period}_${today}.${format}`;
     if (format === 'pdf') {
-      const buffer = await exportService.buildStockPdf(data);
+      const buffer = await exportService.buildStockPdf(data, periodLabel);
       sendFile(res, buffer, filename, 'application/pdf');
     } else {
-      const buffer = await exportService.buildStockExcel(data);
+      const buffer = await exportService.buildStockExcel(data, periodLabel);
       sendFile(res, buffer, filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
   } catch (err) {

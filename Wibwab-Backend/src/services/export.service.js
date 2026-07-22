@@ -21,6 +21,13 @@ function formatDateThai(d) {
   return new Date().toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' });
 }
 
+// ป้ายช่วงเวลาของหน้าภาพรวม — เพิ่ม '1d' (รายวัน) นอกเหนือจาก 7d/30d เดิม
+function dashboardRangeLabel(range) {
+  if (range === '30d') return '30 วันล่าสุด';
+  if (range === '1d') return 'วันนี้';
+  return '7 วันล่าสุด';
+}
+
 // ============================================================
 // Excel helpers
 // ============================================================
@@ -50,10 +57,10 @@ function addTitleBlock(sheet, title, subtitle, colSpan) {
   sheet.addRow([]); // spacer row 3
 }
 
-function addKpiSheet(workbook, kpis) {
+function addKpiSheet(workbook, kpis, subtitle = `ส่งออกเมื่อ ${formatDateThai()}`) {
   const sheet = workbook.addWorksheet('สรุปภาพรวม');
   sheet.columns = [{ width: 34 }, { width: 24 }];
-  addTitleBlock(sheet, 'สรุปภาพรวม (KPI)', `ส่งออกเมื่อ ${formatDateThai()}`, 2);
+  addTitleBlock(sheet, 'สรุปภาพรวม (KPI)', subtitle, 2);
   const headerRow = sheet.addRow(['รายการ', 'ค่า']);
   styleHeaderRow(headerRow);
   kpis.forEach(([label, value]) => {
@@ -101,7 +108,7 @@ async function buildDashboardExcel(data) {
   workbook.created = new Date();
 
   addKpiSheet(workbook, [
-    ['ช่วงเวลา', data.range === '30d' ? '30 วันล่าสุด' : '7 วันล่าสุด'],
+    ['ช่วงเวลา', dashboardRangeLabel(data.range)],
     ['ยอดขายวันนี้', formatCurrency(data.kpis.sales_today)],
     ['รายได้เดือนนี้', formatCurrency(data.kpis.revenue_this_month)],
     ['คำสั่งซื้อทั้งหมด', data.kpis.total_orders],
@@ -112,7 +119,7 @@ async function buildDashboardExcel(data) {
     workbook,
     'ยอดขายรายวัน',
     'ยอดขายรายวัน',
-    data.range === '30d' ? '30 วันล่าสุด' : '7 วันล่าสุด',
+    dashboardRangeLabel(data.range),
     [
       { key: 'date', header: 'วันที่', width: 16 },
       { key: 'total', header: 'ยอดขาย (บาท)', width: 20, align: 'right', numFmt: '#,##0' },
@@ -179,23 +186,28 @@ async function buildSalesExcel(data) {
   return workbook.xlsx.writeBuffer();
 }
 
-async function buildStockExcel(data) {
+async function buildStockExcel(data, periodLabel) {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = BRAND_NAME;
   workbook.created = new Date();
+  const subtitle = `${periodLabel} · ส่งออกเมื่อ ${formatDateThai()}`;
 
-  addKpiSheet(workbook, [
-    ['SKU ทั้งหมด', data.kpis.total_skus],
-    ['มีสต็อก', data.kpis.in_stock],
-    ['สต็อกต่ำ', data.kpis.low_stock],
-    ['หมดสต็อก', data.kpis.out_of_stock],
-  ]);
+  addKpiSheet(
+    workbook,
+    [
+      ['SKU ทั้งหมด', data.kpis.total_skus],
+      ['มีสต็อก', data.kpis.in_stock],
+      ['สต็อกต่ำ', data.kpis.low_stock],
+      ['หมดสต็อก', data.kpis.out_of_stock],
+    ],
+    subtitle
+  );
 
   addTableSheet(
     workbook,
     'สินค้าใกล้หมดสต็อก',
     'สินค้าใกล้หมดสต็อก',
-    formatDateThai(),
+    subtitle,
     [
       { key: 'name', header: 'สินค้า', width: 26 },
       { key: 'sku', header: 'SKU', width: 16 },
@@ -210,7 +222,7 @@ async function buildStockExcel(data) {
     workbook,
     'สินค้าที่ขายช้า',
     'สินค้าที่ขายช้า (ไม่มีการขายมากกว่า 90 วัน)',
-    formatDateThai(),
+    subtitle,
     [
       { key: 'name', header: 'สินค้า', width: 28 },
       { key: 'category', header: 'หมวดหมู่', width: 20 },
@@ -394,7 +406,7 @@ function pdfBufferFromDoc(doc) {
 
 async function buildDashboardPdf(data) {
   const doc = newPdfDoc();
-  const rangeLabel = data.range === '30d' ? '30 วันล่าสุด' : '7 วันล่าสุด';
+  const rangeLabel = dashboardRangeLabel(data.range);
   pdfHeader(doc, 'ภาพรวม', `ช่วงเวลา ${rangeLabel} · ส่งออกเมื่อ ${formatDateThai()}`);
 
   pdfKpiGrid(doc, [
@@ -465,9 +477,9 @@ async function buildSalesPdf(data) {
   return pdfBufferFromDoc(doc);
 }
 
-async function buildStockPdf(data) {
+async function buildStockPdf(data, periodLabel) {
   const doc = newPdfDoc();
-  pdfHeader(doc, 'รายงานสต็อก', `ส่งออกเมื่อ ${formatDateThai()}`);
+  pdfHeader(doc, 'รายงานสต็อก', `${periodLabel} · ส่งออกเมื่อ ${formatDateThai()}`);
 
   pdfKpiGrid(doc, [
     ['SKU ทั้งหมด', data.kpis.total_skus.toLocaleString('th-TH')],

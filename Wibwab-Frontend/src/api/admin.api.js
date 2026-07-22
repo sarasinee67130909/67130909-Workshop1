@@ -77,9 +77,9 @@ export function exportSalesReport({ from, to, category, format = 'xlsx' } = {}) 
   return downloadReport('/api/admin/reports/sales/export', { from, to, category }, format);
 }
 
-// format: 'xlsx' | 'pdf'
-export function exportStockReport({ format = 'xlsx' } = {}) {
-  return downloadReport('/api/admin/reports/stock/export', {}, format);
+// { period: 'daily' | 'weekly', format: 'xlsx' | 'pdf' }
+export function exportStockReport({ period = 'daily', format = 'xlsx' } = {}) {
+  return downloadReport('/api/admin/reports/stock/export', { period }, format);
 }
 
 // { from, to, format: 'xlsx' | 'pdf' }

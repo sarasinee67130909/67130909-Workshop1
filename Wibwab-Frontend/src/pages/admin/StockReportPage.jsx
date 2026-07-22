@@ -16,6 +16,7 @@ export default function StockReportPage() {
   const [error, setError] = useState('');
   const [restockingId, setRestockingId] = useState(null);
   const [highlightVariantId, setHighlightVariantId] = useState(location.state?.highlightVariantId ?? null);
+  const [exportPeriod, setExportPeriod] = useState('daily');
 
   const load = useCallback(() => {
     setLoading(true);
@@ -81,10 +82,16 @@ export default function StockReportPage() {
       <div className="admin-page-header">
         <h1>รายงานสต็อก</h1>
         <div className="admin-page-header__actions">
-          <div className="admin-filters">
-            <span className="admin-link-btn">ช่วงวันที่</span>
-          </div>
-          <ExportMenu onExport={(format) => exportStockReport({ format })} label="ส่งออก" />
+          <select
+            className="admin-select"
+            value={exportPeriod}
+            onChange={(e) => setExportPeriod(e.target.value)}
+            aria-label="ช่วงเวลาที่จะส่งออก"
+          >
+            <option value="daily">ส่งออกรายวัน</option>
+            <option value="weekly">ส่งออกรายสัปดาห์</option>
+          </select>
+          <ExportMenu onExport={(format) => exportStockReport({ period: exportPeriod, format })} label="ส่งออก" />
         </div>
       </div>
 

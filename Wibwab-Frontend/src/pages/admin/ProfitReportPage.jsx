@@ -36,6 +36,24 @@ function monthFullLabel(ym) {
   });
 }
 
+// ตัวเลือกเดือนย้อนหลัง 12 เดือน (รวมเดือนปัจจุบัน) สำหรับ "ส่งออกรายเดือน" — แยกจากช่วงที่แสดงบนหน้าจอ (defaultRange)
+function buildExportMonthOptions() {
+  const now = new Date();
+  const options = [];
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
+    const year = d.getUTCFullYear();
+    const month = d.getUTCMonth();
+    const from = toDateStr(new Date(Date.UTC(year, month, 1)));
+    const isCurrentMonth = i === 0;
+    const lastDay = new Date(Date.UTC(year, month + 1, 0));
+    const to = isCurrentMonth ? toDateStr(now) : toDateStr(lastDay);
+    const value = `${year}-${String(month + 1).padStart(2, '0')}`;
+    options.push({ value, label: monthFullLabel(value), from, to });
+  }
+  return options;
+}
+
 export default function ProfitReportPage() {
   // ค่าเริ่มต้น: ปีปฏิทินปัจจุบัน (1 ม.ค. — วันนี้) ให้ครอบคลุมแนวโน้มรายเดือนทั้งปี
   const defaultRange = useMemo(() => {
@@ -46,6 +64,10 @@ export default function ProfitReportPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // ตัวเลือกเดือนสำหรับ "ส่งออกรายเดือน" — แยกอิสระจาก defaultRange ที่ใช้แสดงผลบนหน้าจอ (YTD)
+  const exportMonthOptions = useMemo(buildExportMonthOptions, []);
+  const [exportMonthValue, setExportMonthValue] = useState(exportMonthOptions[0].value);
 
   useEffect(() => {
     let active = true;
@@ -97,8 +119,23 @@ export default function ProfitReportPage() {
           <span className="admin-link-btn">
             {defaultRange.from} — {defaultRange.to}
           </span>
+          <select
+            className="admin-select"
+            value={exportMonthValue}
+            onChange={(e) => setExportMonthValue(e.target.value)}
+            aria-label="เดือนที่จะส่งออกกำไร"
+          >
+            {exportMonthOptions.map((m) => (
+              <option key={m.value} value={m.value}>
+                ส่งออกกำไรเดือน{m.label}
+              </option>
+            ))}
+          </select>
           <ExportMenu
-            onExport={(format) => exportProfitReport({ from: defaultRange.from, to: defaultRange.to, format })}
+            onExport={(format) => {
+              const selected = exportMonthOptions.find((m) => m.value === exportMonthValue) || exportMonthOptions[0];
+              return exportProfitReport({ from: selected.from, to: selected.to, format });
+            }}
             label="ส่งออก"
           />
         </div>

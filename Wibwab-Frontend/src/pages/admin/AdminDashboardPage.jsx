@@ -14,6 +14,8 @@ function formatPct(p) {
 
 export default function AdminDashboardPage() {
   const [range, setRange] = useState('7d');
+  // ช่วงเวลาสำหรับ "ส่งออก" แยกจาก range ที่ใช้แสดงผลบนหน้าจอ — เลือกได้แค่รายวัน/รายสัปดาห์
+  const [exportRange, setExportRange] = useState('7d');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -66,7 +68,16 @@ export default function AdminDashboardPage() {
               {range === '7d' ? '7 วันล่าสุด' : '30 วันล่าสุด'}
             </span>
           </div>
-          <ExportMenu onExport={(format) => exportAdminDashboard({ range, format })} label="ส่งออก" />
+          <select
+            className="admin-select"
+            value={exportRange}
+            onChange={(e) => setExportRange(e.target.value)}
+            aria-label="ช่วงเวลาที่จะส่งออก"
+          >
+            <option value="1d">ส่งออกรายวัน</option>
+            <option value="7d">ส่งออกรายสัปดาห์</option>
+          </select>
+          <ExportMenu onExport={(format) => exportAdminDashboard({ range: exportRange, format })} label="ส่งออก" />
         </div>
       </div>
 
