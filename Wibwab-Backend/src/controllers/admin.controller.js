@@ -1,6 +1,8 @@
 // controllers/admin.controller.js — รับ req → เรียก service → ส่ง response
 const reportService = require('../services/report.service');
 const exportService = require('../services/export.service');
+const notificationService = require('../services/notification.service');
+const { ADMIN_NOTIFICATION_TYPES } = require('../utils/notificationType');
 const { httpError } = require('../utils/validators');
 
 // ตั้งชื่อไฟล์ + header ให้ browser ดาวน์โหลดไฟล์แทนการแสดงผลใน tab
@@ -134,6 +136,36 @@ async function profitReportExport(req, res, next) {
   }
 }
 
+// ── Notifications ──
+// ตรวจออเดอร์ค้าง pending_payment เกิน 24 ชม. ตอนเปิดหน้านี้เลย (ไม่มี background job แยก)
+async function listNotifications(req, res, next) {
+  try {
+    await notificationService.sweepOverdueOrders();
+    const data = await notificationService.listNotifications(ADMIN_NOTIFICATION_TYPES);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function markNotificationRead(req, res, next) {
+  try {
+    const data = await notificationService.markRead(req.params.id);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function markAllNotificationsRead(req, res, next) {
+  try {
+    const data = await notificationService.markAllRead(ADMIN_NOTIFICATION_TYPES);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   dashboard,
   dashboardExport,
@@ -143,4 +175,7 @@ module.exports = {
   salesReportExport,
   stockReportExport,
   profitReportExport,
+  listNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
 };

@@ -86,3 +86,19 @@ export function exportStockReport({ format = 'xlsx' } = {}) {
 export function exportProfitReport({ from, to, format = 'xlsx' } = {}) {
   return downloadReport('/api/admin/reports/profit/export', { from, to }, format);
 }
+
+// ── Notifications ──
+export async function getAdminNotifications() {
+  const res = await client.get('/api/admin/notifications');
+  return res.data;
+}
+
+export async function markAdminNotificationRead(id) {
+  const res = await client.put(`/api/admin/notifications/${id}/read`);
+  return res.data;
+}
+
+export async function markAllAdminNotificationsRead() {
+  const res = await client.put('/api/admin/notifications/read-all');
+  return res.data;
+}

@@ -21,4 +21,9 @@ router.get('/reports/sales/export', adminController.salesReportExport);
 router.get('/reports/stock/export', adminController.stockReportExport);
 router.get('/reports/profit/export', adminController.profitReportExport);
 
+// ── Notifications ──
+router.get('/notifications', adminController.listNotifications);
+router.put('/notifications/:id/read', adminController.markNotificationRead);
+router.put('/notifications/read-all', adminController.markAllNotificationsRead);
+
 module.exports = router;

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getStockReport, exportStockReport } from '../../api/admin.api';
 import { updateVariantStock } from '../../api/staff.api';
 import ExportMenu from '../../components/common/ExportMenu';
@@ -8,10 +9,13 @@ function formatCurrency(n) {
 }
 
 export default function StockReportPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [restockingId, setRestockingId] = useState(null);
+  const [highlightVariantId, setHighlightVariantId] = useState(location.state?.highlightVariantId ?? null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -30,6 +34,15 @@ export default function StockReportPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // มาจากคลิกแจ้งเตือนสต็อกใกล้หมด (AdminTopbar ส่ง state.highlightVariantId มาทาง navigate) — เลื่อนไปแถวนั้นให้
+  useEffect(() => {
+    if (!highlightVariantId || !data) return;
+    const row = document.getElementById(`variant-row-${highlightVariantId}`);
+    row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    navigate(location.pathname, { replace: true, state: {} });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   async function handleRestock(item) {
     const input = window.prompt(`เติมสต็อกสินค้า "${item.name}" (${item.sku}) กี่ชิ้น?`, '10');
@@ -137,7 +150,15 @@ export default function StockReportPage() {
                 </tr>
               )}
               {lowStockItems.map((item) => (
-                <tr key={item.variant_id}>
+                <tr
+                  key={item.variant_id}
+                  id={`variant-row-${item.variant_id}`}
+                  style={
+                    highlightVariantId === item.variant_id
+                      ? { backgroundColor: 'var(--admin-gold-soft)' }
+                      : undefined
+                  }
+                >
                   <td>
                     <div className="admin-cell-thumb">
                       <div className="admin-cell-thumb-placeholder">

@@ -2,6 +2,25 @@
 // ใช้ร่วมกันโดย staff.service (หน้า Inventory) และรองรับ order.service (คืนสต็อกตอนยกเลิกออเดอร์)
 const pool = require('../config/db');
 const { httpError } = require('../utils/validators');
+const notificationService = require('./notification.service');
+
+// เช็ค stock_qty ล่าสุดเทียบ low_stock_threshold แล้วยิงแจ้งเตือนถ้าถึงเกณฑ์ (ไม่ throw — พลาดได้โดยไม่กระทบการปรับสต็อก)
+async function checkLowStockAlert(variantId) {
+  const [rows] = await pool.query(
+    `SELECT v.stock_qty, v.low_stock_threshold, v.sku, p.name
+       FROM product_variants v
+       JOIN products p ON p.id = v.product_id
+      WHERE v.id = ?`,
+    [variantId]
+  );
+  if (rows.length === 0) return;
+  const v = rows[0];
+  if (v.stock_qty > v.low_stock_threshold) return;
+
+  notificationService
+    .notifyLowStock({ variantId, productName: v.name, sku: v.sku, stockQty: v.stock_qty })
+    .catch((err) => console.error('สร้างการแจ้งเตือนสต็อกใกล้หมดไม่สำเร็จ:', err));
+}
 
 // ตั้งจำนวนสต็อกใหม่แบบตรงๆ (ใช้จากช่อง "แก้ไขด่วน" หน้า Inventory)
 async function setStock(variantId, newQty) {
@@ -13,6 +32,7 @@ async function setStock(variantId, newQty) {
     variantId,
   ]);
   if (result.affectedRows === 0) throw httpError(404, 'ไม่พบตัวเลือกสินค้านี้');
+  checkLowStockAlert(variantId);
   return { variant_id: Number(variantId), stock_qty: Number(newQty) };
 }
 
@@ -27,6 +47,7 @@ async function adjustStock(variantId, delta) {
     throw httpError(400, 'ปรับสต็อกไม่สำเร็จ (จะทำให้สต็อกติดลบ หรือไม่พบตัวเลือกสินค้านี้)');
   }
   const [rows] = await pool.query('SELECT stock_qty FROM product_variants WHERE id = ?', [variantId]);
+  if (delta < 0) checkLowStockAlert(variantId); // แจ้งเฉพาะตอนสต็อกลดลง ไม่ใช่ตอนเติมสต็อก
   return { variant_id: Number(variantId), stock_qty: rows[0].stock_qty };
 }
 

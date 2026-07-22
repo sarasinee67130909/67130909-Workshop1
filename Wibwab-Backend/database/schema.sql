@@ -221,10 +221,12 @@ CREATE TABLE user_coupons (
 -- ---------------------------------------------------------------------
 CREATE TABLE notifications (
   id         INT AUTO_INCREMENT PRIMARY KEY,
-  type       ENUM('new_order','slip_uploaded','order_cancelled','new_review') NOT NULL,
+  type       ENUM('new_order','slip_uploaded','order_cancelled','new_review','low_stock','order_overdue') NOT NULL,
   message    VARCHAR(255) NOT NULL,
   order_id   INT NULL,
+  variant_id INT NULL,  -- ใช้กับ type='low_stock' เพื่อ deep-link ไปตัวเลือกสินค้าที่ใกล้หมด
   is_read    BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
