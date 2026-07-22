@@ -28,6 +28,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 // ── ฝั่งแอดมิน/ผู้บริหาร (ธีม Slate + ทอง) ──
 import AdminLayout from './components/common/AdminLayout';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminForgotPasswordPage from './pages/admin/AdminForgotPasswordPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import SalesReportPage from './pages/admin/SalesReportPage';
 import StockReportPage from './pages/admin/StockReportPage';
@@ -123,6 +124,7 @@ function App() {
 
       {/* ── ฝั่งแอดมิน/ผู้บริหาร (ธีม Slate + ทอง) ── */}
       <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
       <Route
         path="/admin"
         element={

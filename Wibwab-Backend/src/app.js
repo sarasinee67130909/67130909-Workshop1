@@ -30,6 +30,7 @@ app.use('/api/favorites', favoriteRoutes);
 // TODO(Dev2): mount routes ฝั่งพนักงาน/แอดมินตรงนี้เมื่อพร้อม
 app.use('/api/staff', require('./routes/staff.routes'));
 app.use('/api/admin', require('./routes/admin.routes'));
+app.use('/api/admin-auth', require('./routes/adminAuth.routes'));
 
 // หมายเหตุ: ไม่มี cart routes โดยดีไซน์ — ตะกร้าเก็บฝั่ง client (localStorage) ตาม §3
 

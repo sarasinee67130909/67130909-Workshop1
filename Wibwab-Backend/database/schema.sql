@@ -211,6 +211,22 @@ CREATE TABLE password_resets (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
+-- password_reset_otps — รหัส OTP 6 หลักสำหรับลืมรหัสผ่านฝั่ง Admin (ส่งอีเมลจริงผ่าน utils/mailer.js)
+-- แยกจาก password_resets (แบบลิงก์/จำลองอีเมล ใช้กับลูกค้า) เพราะเป็นคนละกลไก — โค้ด 6 หลักให้กรอกเอง
+-- ไม่ใช่ token ยาวที่ฝังมากับลิงก์ จึงไม่บังคับ UNIQUE (กันชนกันข้ามผู้ใช้/เวลา)
+-- ---------------------------------------------------------------------
+CREATE TABLE password_reset_otps (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT NOT NULL,
+  otp_code   VARCHAR(6) NOT NULL,
+  expires_at DATETIME NOT NULL,  -- หมดอายุ 10 นาทีหลังสร้าง
+  used       BOOLEAN NOT NULL DEFAULT FALSE,  -- ใช้ได้ครั้งเดียว
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_otp_lookup (user_id, otp_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
 -- user_coupons — กระเป๋าคูปองลูกค้า (โค้ดที่ถูก push เข้าบัญชีลูกค้าคนใดคนหนึ่งโดยเฉพาะ)
 -- โค้ดที่มีแถวในตารางนี้ = ใช้ได้เฉพาะเจ้าของแถวเท่านั้น (ตรวจใน order.service.js:checkPromo)
 -- ส่วนโค้ด public เดิมที่ไม่เคยถูก push ให้ใคร ยังใช้ได้ทุกคนเหมือนเดิม

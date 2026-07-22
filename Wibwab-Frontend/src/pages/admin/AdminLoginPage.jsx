@@ -90,7 +90,7 @@ export default function AdminLoginPage() {
           <div className="admin-form-group">
             <div className="admin-form-label-row">
               <label className="admin-form-label" htmlFor="password">รหัสผ่าน</label>
-              <Link to="#" className="admin-form-link">ลืมรหัสผ่าน?</Link>
+              <Link to="/admin/forgot-password" className="admin-form-link">ลืมรหัสผ่าน?</Link>
             </div>
             <div className="admin-input-wrap">
               <span className="material-symbols-outlined">lock</span>
