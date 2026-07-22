@@ -11,11 +11,19 @@ const NAV_ITEMS = [
   { to: '/admin/profit-report', label: 'รายงานกำไร', icon: 'trending_up' },
 ];
 
+// สร้างอักษรย่อจากชื่อ-นามสกุลจริง (เช่น "มานี มีทรัพย์" → "มม") ไว้โชว์ตอนไม่มีรูปโปรไฟล์
+function getInitials(fullName) {
+  if (!fullName) return '?';
+  const parts = fullName.trim().split(/\s+/);
+  const initials = parts.slice(0, 2).map((p) => p.charAt(0)).join('');
+  return initials.toUpperCase() || '?';
+}
+
 /**
  * Sidebar นำทางฝั่งแอดมิน (Executive Suite)
  */
 export default function AdminSidebar() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   async function handleSignOut() {
@@ -26,12 +34,10 @@ export default function AdminSidebar() {
   return (
     <nav className="admin-sidebar">
       <div className="admin-sidebar__brand">
-        <div className="admin-sidebar__logo">
-          <span className="material-symbols-outlined">diamond</span>
-        </div>
-        <div>
-          <h1>Jewelry Analytics</h1>
-          <p>Executive Portal</p>
+        <div className="admin-sidebar__logo">{getInitials(user?.full_name)}</div>
+        <div className="admin-sidebar__brand-text">
+          <h1>{user?.full_name ?? 'แอดมิน'}</h1>
+          <p>{user?.email ?? ''}</p>
         </div>
       </div>
 

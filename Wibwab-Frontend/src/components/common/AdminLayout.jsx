@@ -14,13 +14,13 @@ import '../../styles/admin.css';
  *     <Route path="profit-report" element={<ProfitReportPage />} />
  *   </Route>
  */
-export default function AdminLayout({ title }) {
+export default function AdminLayout() {
   return (
     <div className="admin-app">
       <div className="admin-layout">
         <AdminSidebar />
         <div className="admin-main">
-          <AdminTopbar title={title} />
+          <AdminTopbar />
           <main className="admin-content">
             <Outlet />
           </main>
