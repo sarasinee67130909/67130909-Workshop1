@@ -1,5 +1,3 @@
-
-
 # **1\. ชื่อโครงงาน**
 
 ภาษาไทย: ระบบซื้อขายเครื่องประดับแฟชั่นออนไลน์ วิบวับ
@@ -188,201 +186,269 @@
 
 # **14\. โครงสร้างฐานข้อมูล (Database Schema)**
 
-ฐานข้อมูล MySQL ชื่อ `wibwab_db` ประกอบด้วย 15 ตาราง ดังนี้
+ฐานข้อมูล MySQL ชื่อ `wibwab_db` — โครงสร้างตาราง (`schema.json`):
 
-## **14.1 users** — ผู้ใช้ทุกคน แยกบทบาทด้วยคอลัมน์ role
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key, auto_increment |
-| email | varchar(255) | ไม่ได้ | |
-| password_hash | varchar(255) | ไม่ได้ | |
-| full_name | varchar(150) | ไม่ได้ | |
-| phone | varchar(20) | ได้ | |
-| role | enum('customer','staff','admin') | ไม่ได้ | ค่าเริ่มต้น customer |
-| created_at | timestamp | ไม่ได้ | ค่าเริ่มต้น CURRENT_TIMESTAMP |
-| updated_at | timestamp | ไม่ได้ | อัปเดตอัตโนมัติ |
-
-## **14.2 addresses** — ที่อยู่จัดส่งของลูกค้า (1 คนมีได้หลายที่อยู่)
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| user_id | int | ไม่ได้ | FK → users.id (ON DELETE CASCADE) |
-| recipient_name | varchar(150) | ไม่ได้ | |
-| phone | varchar(20) | ไม่ได้ | |
-| address_line | varchar(255) | ไม่ได้ | |
-| subdistrict | varchar(100) | ไม่ได้ | |
-| district | varchar(100) | ไม่ได้ | |
-| province | varchar(100) | ไม่ได้ | |
-| postal_code | varchar(10) | ไม่ได้ | |
-| is_default | tinyint(1) | ไม่ได้ | ค่าเริ่มต้น 0 |
-| created_at | timestamp | ไม่ได้ | |
-
-## **14.3 categories** — หมวดหมู่สินค้า
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| name | varchar(100) | ไม่ได้ | |
-| description | varchar(255) | ได้ | |
-
-## **14.4 products** — ข้อมูลสินค้าหลัก
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| category_id | int | ไม่ได้ | FK → categories.id |
-| name | varchar(200) | ไม่ได้ | |
-| description | text | ได้ | |
-| is_visible | tinyint(1) | ไม่ได้ | ค่าเริ่มต้น 1 (แสดง/ซ่อนหน้าร้าน) |
-| created_at | timestamp | ไม่ได้ | |
-| updated_at | timestamp | ไม่ได้ | อัปเดตอัตโนมัติ |
-
-## **14.5 product_images** — รูปสินค้า (1 สินค้ามีได้หลายรูป)
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| product_id | int | ไม่ได้ | FK → products.id (ON DELETE CASCADE) |
-| image_path | varchar(255) | ไม่ได้ | |
-| is_primary | tinyint(1) | ไม่ได้ | รูปหลักที่แสดงในการ์ดสินค้า |
-| sort_order | int | ไม่ได้ | ลำดับการแสดงรูป |
-
-## **14.6 product_variants** — ตัวเลือกสินค้า (ไซซ์ × สี × วัสดุ) — สต็อกและราคาอยู่ที่ตารางนี้
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| product_id | int | ไม่ได้ | FK → products.id (ON DELETE CASCADE) |
-| sku | varchar(50) | ไม่ได้ | |
-| size | varchar(50) | ได้ | |
-| color | varchar(50) | ได้ | |
-| material | varchar(100) | ได้ | |
-| price | decimal(10,2) | ไม่ได้ | |
-| cost_price | decimal(10,2) | ไม่ได้ | ต้นทุนต่อชิ้น ใช้คำนวณกำไร |
-| stock_qty | int | ไม่ได้ | ค่าเริ่มต้น 0 |
-| low_stock_threshold | int | ไม่ได้ | ค่าเริ่มต้น 5 |
-| is_active | tinyint(1) | ไม่ได้ | ค่าเริ่มต้น 1 |
-
-## **14.7 favorites** — รายการโปรดของลูกค้า
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| user_id | int | ไม่ได้ | FK → users.id (ON DELETE CASCADE) |
-| product_id | int | ไม่ได้ | FK → products.id (ON DELETE CASCADE), UNIQUE(user_id, product_id) |
-| created_at | timestamp | ไม่ได้ | |
-
-## **14.8 promo_codes** — โค้ดส่วนลด
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| code | varchar(50) | ไม่ได้ | |
-| discount_type | enum('percent','fixed') | ไม่ได้ | |
-| discount_value | decimal(10,2) | ไม่ได้ | |
-| min_order_total | decimal(10,2) | ไม่ได้ | ยอดสั่งซื้อขั้นต่ำ |
-| expires_at | datetime | ได้ | NULL = ไม่มีวันหมดอายุ |
-| usage_limit | int | ได้ | NULL = ไม่จำกัด |
-| used_count | int | ไม่ได้ | ค่าเริ่มต้น 0 |
-| is_active | tinyint(1) | ไม่ได้ | ค่าเริ่มต้น 1 |
-| push_trigger | enum('manual','on_register') | ไม่ได้ | on_register = แจกอัตโนมัติตอนสมัครสมาชิก |
-| label | varchar(150) | ได้ | ชื่อแสดงผลในกระเป๋าคูปอง |
-
-## **14.9 orders** — คำสั่งซื้อ
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| user_id | int | ไม่ได้ | FK → users.id |
-| status | enum('pending_payment','paid','preparing','shipped','delivered','cancelled') | ไม่ได้ | ค่าเริ่มต้น pending_payment |
-| shipping_name | varchar(150) | ไม่ได้ | Snapshot ที่อยู่ ณ วันสั่งซื้อ |
-| shipping_phone | varchar(20) | ไม่ได้ | |
-| shipping_address | text | ไม่ได้ | |
-| shipping_postal_code | varchar(10) | ไม่ได้ | |
-| subtotal | decimal(10,2) | ไม่ได้ | ยอดก่อนหักส่วนลด |
-| discount_amount | decimal(10,2) | ไม่ได้ | ค่าเริ่มต้น 0 |
-| promo_code_id | int | ได้ | FK → promo_codes.id (ON DELETE SET NULL) |
-| gift_wrap | tinyint(1) | ไม่ได้ | ค่าเริ่มต้น 0 |
-| gift_message | text | ได้ | |
-| total_amount | decimal(10,2) | ไม่ได้ | ยอดสุทธิ |
-| slip_image | varchar(255) | ได้ | path สลิปโอนเงิน |
-| tracking_number | varchar(100) | ได้ | |
-| paid_at | datetime | ได้ | |
-| created_at | timestamp | ไม่ได้ | |
-| updated_at | timestamp | ไม่ได้ | อัปเดตอัตโนมัติ |
-
-## **14.10 order_items** — รายการสินค้าในแต่ละคำสั่งซื้อ
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| order_id | int | ไม่ได้ | FK → orders.id (ON DELETE CASCADE) |
-| variant_id | int | ไม่ได้ | FK → product_variants.id |
-| quantity | int | ไม่ได้ | |
-| unit_price | decimal(10,2) | ไม่ได้ | Snapshot ราคา ณ วันซื้อ |
-| unit_cost | decimal(10,2) | ไม่ได้ | Snapshot ต้นทุน ณ วันซื้อ |
-
-## **14.11 user_coupons** — กระเป๋าคูปองของลูกค้า
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| user_id | int | ไม่ได้ | FK → users.id (ON DELETE CASCADE) |
-| promo_code_id | int | ไม่ได้ | FK → promo_codes.id (ON DELETE CASCADE) |
-| is_used | tinyint(1) | ไม่ได้ | ค่าเริ่มต้น 0 |
-| used_order_id | int | ได้ | FK → orders.id (ON DELETE SET NULL) |
-| assigned_at | timestamp | ไม่ได้ | |
-| used_at | datetime | ได้ | |
-
-## **14.12 reviews** — รีวิวสินค้า (เฉพาะออเดอร์ที่สถานะ delivered)
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| user_id | int | ไม่ได้ | FK → users.id (ON DELETE CASCADE) |
-| product_id | int | ไม่ได้ | FK → products.id (ON DELETE CASCADE) |
-| order_id | int | ไม่ได้ | FK → orders.id (ON DELETE CASCADE) |
-| rating | tinyint | ไม่ได้ | 1-5 ดาว |
-| comment | text | ได้ | |
-| created_at | timestamp | ไม่ได้ | |
-
-## **14.13 notifications** — แจ้งเตือนฝั่งพนักงาน/แอดมิน
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| type | enum('new_order','slip_uploaded','order_cancelled','new_review','low_stock','order_overdue') | ไม่ได้ | |
-| message | varchar(255) | ไม่ได้ | |
-| order_id | int | ได้ | FK → orders.id (ON DELETE CASCADE) |
-| variant_id | int | ได้ | FK → product_variants.id (ON DELETE CASCADE) |
-| product_id | int | ได้ | FK → products.id (ON DELETE CASCADE) |
-| review_id | int | ได้ | FK → reviews.id (ON DELETE CASCADE) |
-| is_read | tinyint(1) | ไม่ได้ | ค่าเริ่มต้น 0 |
-| created_at | timestamp | ไม่ได้ | |
-
-## **14.14 password_resets** — ลืมรหัสผ่านฝั่งลูกค้า (ลิงก์ยืนยัน)
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| token | varchar(255) | ไม่ได้ | |
-| user_id | int | ไม่ได้ | FK → users.id (ON DELETE CASCADE) |
-| expires_at | datetime | ไม่ได้ | |
-| used | tinyint(1) | ไม่ได้ | ค่าเริ่มต้น 0 |
-| created_at | timestamp | ไม่ได้ | |
-
-## **14.15 password_reset_otps** — ลืมรหัสผ่านฝั่งพนักงาน/แอดมิน (OTP 6 หลัก ส่งอีเมลจริง)
-
-| คอลัมน์ | ชนิดข้อมูล | Null ได้ไหม | หมายเหตุ |
-|---|---|---|---|
-| id | int | ไม่ได้ | Primary Key |
-| user_id | int | ไม่ได้ | FK → users.id (ON DELETE CASCADE) |
-| otp_code | varchar(6) | ไม่ได้ | |
-| expires_at | datetime | ไม่ได้ | |
-| used | tinyint(1) | ไม่ได้ | ค่าเริ่มต้น 0 |
-| created_at | timestamp | ไม่ได้ | |
+```json
+{
+  "database": "wibwab",
+  "description": "E-commerce platform database schema (Wibwab)",
+  "generated_from": "wibwab_db.pdf",
+  "tables": {
+    "users": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "email", "type": "varchar(255)", "nullable": false },
+        { "name": "password_hash", "type": "varchar(255)", "nullable": false },
+        { "name": "full_name", "type": "varchar(150)", "nullable": false },
+        { "name": "phone", "type": "varchar(20)", "nullable": true, "default": null },
+        { "name": "role", "type": "enum", "enum_values": ["customer", "staff", "admin"], "nullable": false, "default": "customer" },
+        { "name": "created_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" },
+        { "name": "updated_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP", "extra": "on update CURRENT_TIMESTAMP" }
+      ],
+      "foreign_keys": []
+    },
+    "addresses": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "user_id", "type": "int", "nullable": false },
+        { "name": "recipient_name", "type": "varchar(150)", "nullable": false },
+        { "name": "phone", "type": "varchar(20)", "nullable": false },
+        { "name": "address_line", "type": "varchar(255)", "nullable": false },
+        { "name": "subdistrict", "type": "varchar(100)", "nullable": false },
+        { "name": "district", "type": "varchar(100)", "nullable": false },
+        { "name": "province", "type": "varchar(100)", "nullable": false },
+        { "name": "postal_code", "type": "varchar(10)", "nullable": false },
+        { "name": "is_default", "type": "tinyint(1)", "nullable": false, "default": 0 },
+        { "name": "created_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" }
+      ],
+      "foreign_keys": [
+        { "column": "user_id", "references_table": "users", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" }
+      ]
+    },
+    "categories": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "name", "type": "varchar(100)", "nullable": false },
+        { "name": "description", "type": "varchar(255)", "nullable": true, "default": null }
+      ],
+      "foreign_keys": []
+    },
+    "products": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "category_id", "type": "int", "nullable": false },
+        { "name": "name", "type": "varchar(200)", "nullable": false },
+        { "name": "description", "type": "text", "nullable": true, "default": null },
+        { "name": "is_visible", "type": "tinyint(1)", "nullable": false, "default": 1 },
+        { "name": "created_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" },
+        { "name": "updated_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP", "extra": "on update CURRENT_TIMESTAMP" }
+      ],
+      "foreign_keys": [
+        { "column": "category_id", "references_table": "categories", "references_column": "id", "on_update": "RESTRICT", "on_delete": "RESTRICT" }
+      ]
+    },
+    "product_images": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "product_id", "type": "int", "nullable": false },
+        { "name": "image_path", "type": "varchar(255)", "nullable": false },
+        { "name": "is_primary", "type": "tinyint(1)", "nullable": false, "default": 0 },
+        { "name": "sort_order", "type": "int", "nullable": false, "default": 0 }
+      ],
+      "foreign_keys": [
+        { "column": "product_id", "references_table": "products", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" }
+      ]
+    },
+    "product_variants": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "product_id", "type": "int", "nullable": false },
+        { "name": "sku", "type": "varchar(50)", "nullable": false },
+        { "name": "size", "type": "varchar(50)", "nullable": true, "default": null },
+        { "name": "color", "type": "varchar(50)", "nullable": true, "default": null },
+        { "name": "material", "type": "varchar(100)", "nullable": true, "default": null },
+        { "name": "price", "type": "decimal(10,2)", "nullable": false },
+        { "name": "cost_price", "type": "decimal(10,2)", "nullable": false, "default": 0.00 },
+        { "name": "stock_qty", "type": "int", "nullable": false, "default": 0 },
+        { "name": "low_stock_threshold", "type": "int", "nullable": false, "default": 5 },
+        { "name": "is_active", "type": "tinyint(1)", "nullable": false, "default": 1 }
+      ],
+      "foreign_keys": [
+        { "column": "product_id", "references_table": "products", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" }
+      ]
+    },
+    "favorites": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "user_id", "type": "int", "nullable": false },
+        { "name": "product_id", "type": "int", "nullable": false },
+        { "name": "created_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" }
+      ],
+      "foreign_keys": [
+        { "column": "user_id", "references_table": "users", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" },
+        { "column": "product_id", "references_table": "products", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" }
+      ]
+    },
+    "promo_codes": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "code", "type": "varchar(50)", "nullable": false },
+        { "name": "discount_type", "type": "enum", "enum_values": ["percent", "fixed"], "nullable": false },
+        { "name": "discount_value", "type": "decimal(10,2)", "nullable": false },
+        { "name": "min_order_total", "type": "decimal(10,2)", "nullable": false, "default": 0.00 },
+        { "name": "expires_at", "type": "datetime", "nullable": true, "default": null },
+        { "name": "usage_limit", "type": "int", "nullable": true, "default": null },
+        { "name": "used_count", "type": "int", "nullable": false, "default": 0 },
+        { "name": "is_active", "type": "tinyint(1)", "nullable": false, "default": 1 },
+        { "name": "push_trigger", "type": "enum", "enum_values": ["manual", "on_register"], "nullable": false, "default": "manual" },
+        { "name": "label", "type": "varchar(150)", "nullable": true, "default": null }
+      ],
+      "foreign_keys": []
+    },
+    "orders": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "user_id", "type": "int", "nullable": false },
+        { "name": "status", "type": "enum", "enum_values": ["pending_payment", "paid", "preparing", "shipped", "delivered", "cancelled"], "nullable": false, "default": "pending_payment" },
+        { "name": "shipping_name", "type": "varchar(150)", "nullable": false },
+        { "name": "shipping_phone", "type": "varchar(20)", "nullable": false },
+        { "name": "shipping_address", "type": "text", "nullable": false },
+        { "name": "shipping_postal_code", "type": "varchar(10)", "nullable": false },
+        { "name": "subtotal", "type": "decimal(10,2)", "nullable": false },
+        { "name": "discount_amount", "type": "decimal(10,2)", "nullable": false, "default": 0.00 },
+        { "name": "promo_code_id", "type": "int", "nullable": true, "default": null },
+        { "name": "gift_wrap", "type": "tinyint(1)", "nullable": false, "default": 0 },
+        { "name": "gift_message", "type": "text", "nullable": true, "default": null },
+        { "name": "total_amount", "type": "decimal(10,2)", "nullable": false },
+        { "name": "slip_image", "type": "varchar(255)", "nullable": true, "default": null },
+        { "name": "tracking_number", "type": "varchar(100)", "nullable": true, "default": null },
+        { "name": "paid_at", "type": "datetime", "nullable": true, "default": null },
+        { "name": "created_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" },
+        { "name": "updated_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP", "extra": "on update CURRENT_TIMESTAMP" }
+      ],
+      "foreign_keys": [
+        { "column": "user_id", "references_table": "users", "references_column": "id", "on_update": "RESTRICT", "on_delete": "RESTRICT" },
+        { "column": "promo_code_id", "references_table": "promo_codes", "references_column": "id", "on_update": "RESTRICT", "on_delete": "SET_NULL" }
+      ]
+    },
+    "order_items": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "order_id", "type": "int", "nullable": false },
+        { "name": "variant_id", "type": "int", "nullable": false },
+        { "name": "quantity", "type": "int", "nullable": false },
+        { "name": "unit_price", "type": "decimal(10,2)", "nullable": false },
+        { "name": "unit_cost", "type": "decimal(10,2)", "nullable": false, "default": 0.00 }
+      ],
+      "foreign_keys": [
+        { "column": "order_id", "references_table": "orders", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" },
+        { "column": "variant_id", "references_table": "product_variants", "references_column": "id", "on_update": "RESTRICT", "on_delete": "RESTRICT" }
+      ]
+    },
+    "user_coupons": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "user_id", "type": "int", "nullable": false },
+        { "name": "promo_code_id", "type": "int", "nullable": false },
+        { "name": "is_used", "type": "tinyint(1)", "nullable": false, "default": 0 },
+        { "name": "used_order_id", "type": "int", "nullable": true, "default": null },
+        { "name": "assigned_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" },
+        { "name": "used_at", "type": "datetime", "nullable": true, "default": null }
+      ],
+      "foreign_keys": [
+        { "column": "user_id", "references_table": "users", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" },
+        { "column": "promo_code_id", "references_table": "promo_codes", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" },
+        { "column": "used_order_id", "references_table": "orders", "references_column": "id", "on_update": "RESTRICT", "on_delete": "SET_NULL" }
+      ]
+    },
+    "reviews": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "user_id", "type": "int", "nullable": false },
+        { "name": "product_id", "type": "int", "nullable": false },
+        { "name": "order_id", "type": "int", "nullable": false },
+        { "name": "rating", "type": "tinyint", "nullable": false },
+        { "name": "comment", "type": "text", "nullable": true, "default": null },
+        { "name": "created_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" }
+      ],
+      "foreign_keys": [
+        { "column": "user_id", "references_table": "users", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" },
+        { "column": "product_id", "references_table": "products", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" },
+        { "column": "order_id", "references_table": "orders", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" }
+      ]
+    },
+    "notifications": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "type", "type": "enum", "enum_values": ["new_order", "slip_uploaded", "order_cancelled", "new_review", "low_stock", "order_overdue"], "nullable": false },
+        { "name": "message", "type": "varchar(255)", "nullable": false },
+        { "name": "order_id", "type": "int", "nullable": true, "default": null },
+        { "name": "variant_id", "type": "int", "nullable": true, "default": null },
+        { "name": "product_id", "type": "int", "nullable": true, "default": null },
+        { "name": "review_id", "type": "int", "nullable": true, "default": null },
+        { "name": "is_read", "type": "tinyint(1)", "nullable": false, "default": 0 },
+        { "name": "created_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" }
+      ],
+      "foreign_keys": [
+        { "column": "order_id", "references_table": "orders", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" },
+        { "column": "variant_id", "references_table": "product_variants", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" },
+        { "column": "product_id", "references_table": "products", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" },
+        { "column": "review_id", "references_table": "reviews", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" }
+      ]
+    },
+    "password_resets": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "token", "type": "varchar(255)", "nullable": false },
+        { "name": "user_id", "type": "int", "nullable": false },
+        { "name": "expires_at", "type": "datetime", "nullable": false },
+        { "name": "used", "type": "tinyint(1)", "nullable": false, "default": 0 },
+        { "name": "created_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" }
+      ],
+      "foreign_keys": [
+        { "column": "user_id", "references_table": "users", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" }
+      ]
+    },
+    "password_reset_otps": {
+      "columns": [
+        { "name": "id", "type": "int", "nullable": false, "extra": "auto_increment", "primary_key": true },
+        { "name": "user_id", "type": "int", "nullable": false },
+        { "name": "otp_code", "type": "varchar(6)", "nullable": false },
+        { "name": "expires_at", "type": "datetime", "nullable": false },
+        { "name": "used", "type": "tinyint(1)", "nullable": false, "default": 0 },
+        { "name": "created_at", "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" }
+      ],
+      "foreign_keys": [
+        { "column": "user_id", "references_table": "users", "references_column": "id", "on_update": "RESTRICT", "on_delete": "CASCADE" }
+      ]
+    }
+  },
+  "relationships": [
+    { "from_table": "addresses", "from_column": "user_id", "to_table": "users", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "favorites", "from_column": "user_id", "to_table": "users", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "favorites", "from_column": "product_id", "to_table": "products", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "orders", "from_column": "user_id", "to_table": "users", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "orders", "from_column": "promo_code_id", "to_table": "promo_codes", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "order_items", "from_column": "order_id", "to_table": "orders", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "order_items", "from_column": "variant_id", "to_table": "product_variants", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "password_resets", "from_column": "user_id", "to_table": "users", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "password_reset_otps", "from_column": "user_id", "to_table": "users", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "products", "from_column": "category_id", "to_table": "categories", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "product_images", "from_column": "product_id", "to_table": "products", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "product_variants", "from_column": "product_id", "to_table": "products", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "reviews", "from_column": "user_id", "to_table": "users", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "reviews", "from_column": "product_id", "to_table": "products", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "reviews", "from_column": "order_id", "to_table": "orders", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "user_coupons", "from_column": "user_id", "to_table": "users", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "user_coupons", "from_column": "promo_code_id", "to_table": "promo_codes", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "user_coupons", "from_column": "used_order_id", "to_table": "orders", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "notifications", "from_column": "order_id", "to_table": "orders", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "notifications", "from_column": "variant_id", "to_table": "product_variants", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "notifications", "from_column": "product_id", "to_table": "products", "to_column": "id", "type": "many_to_one" },
+    { "from_table": "notifications", "from_column": "review_id", "to_table": "reviews", "to_column": "id", "type": "many_to_one" }
+  ]
+}
+```
 
 # **15\. งานออกแบบ Wireframe และ UI (ทั้ง 3 ส่วน)**
 
@@ -399,3 +465,45 @@
 ## **15.3 ส่วนของแอดมิน (Admin)**
 
 <img width="1598" height="803" alt="admin" src="https://github.com/user-attachments/assets/2f839904-cbbb-4629-b4ef-0e9814019bd0" />
+
+# **16\. ผลตรวจสอบทางเทคนิค (UAT Test Case)**
+
+> ตรวจสอบด้วยการยิง HTTP request จริงไปที่ backend API/DB ที่รันอยู่ (ไม่ใช่การเดาผล) ครอบคลุม 21 Test Case ตามเอกสาร UAT Workshop #7 — รายละเอียดฉบับเต็มดูได้ที่ `UAT_TEST_CASE.md`
+
+| รหัสทดสอบ | วิธีตรวจ | ผลตรวจสอบทางเทคนิค | รายละเอียด |
+| ----- | ----- | :---: | ----- |
+| **Persona: Customer** |  |  |  |
+| **UAT-C01** | ยิง POST /api/auth/register จริง | **✓** | สมัครสำเร็จ 201, สมัครซ้ำอีเมลเดิมถูกปฏิเสธ 400 |
+| **UAT-C01b** | ยิง POST /api/auth/register ด้วยอีเมลผิดรูปแบบ | **✓** | ปฏิเสธ 400 "รูปแบบอีเมลไม่ถูกต้อง" |
+| **UAT-C02** | ยิง POST /api/auth/login | **✓** | รหัสถูกต้อง 200 + token, รหัสผิด 401 |
+| **UAT-C03** | ยิง forgot-password → reset-password → login | **✓** | ตั้งรหัสใหม่ได้, รหัสเดิมใช้ไม่ได้, token เดิมใช้ซ้ำถูกปฏิเสธ 400 |
+| **UAT-C04** | ยิง GET /api/products พร้อม keyword/category/price | **✓** | ค้นหา "แหวน" ได้ 2 รายการตรงชื่อ, คำที่ไม่มีสินค้าได้ผลว่าง, กรองรวมกันทำงานถูกต้อง |
+| **UAT-C05** | ทดสอบด้วยตนเองผ่านเบราว์เซอร์ (Manual — เลือก variant และเพิ่มลงตะกร้าจริงใน ProductDetailPage/CartPage) | **✓** | เลือกไซซ์/สีผ่าน VariantSelector แล้วเพิ่มลงตะกร้าได้ถูกต้อง ราคารวมตรงตาม variant ที่เลือก, ปุ่ม "เพิ่มลงตะกร้า" ถูก disabled เมื่อยังไม่เลือก variant, variant ที่ stock_qty=0 เพิ่มลงตะกร้าไม่ได้, ปรับจำนวนเกินสต็อกถูก clamp ไม่ให้เกิน stock_qty จริง |
+| **UAT-C06** | สร้างออเดอร์จริง + แนบสลิปจริง | **✓** | สร้างออเดอร์สำเร็จ 201, แนบสลิปสำเร็จ, สต็อกถูกตัดถูกต้อง |
+| **UAT-C06b** | ยิง POST /api/orders พร้อมกัน 2 request ด้วย payload เดียวกัน | **✗** | ทั้ง 2 request สร้างออเดอร์สำเร็จพร้อมกัน (order_id ต่างกัน) — ระบบไม่มีกลไกกันคำขอซ้ำระดับ API เลย มีแค่ปุ่ม frontend disabled={isSubmitting} ที่ CheckoutPage.jsx กันคลิกซ้ำได้ระดับ UI เท่านั้น หากมี 2 request เข้าพร้อมกันจริง (เน็ตกระตุก/retry) จะได้ออเดอร์ซ้ำ |
+| **UAT-C06c** | ยิงสั่งซื้อ variant ที่ stock_qty = 0 | **✓** | ปฏิเสธ 400 "มีไม่พอ (เหลือ 0 ชิ้น)" ไม่สร้างออเดอร์ |
+| **UAT-C06d** | เทียบ subtotal/total_amount จาก response กับคำนวณเอง | **✓** | สั่งซื้อ 490×1 + 250×2 = 990 ตรงกับที่ระบบบันทึกทุกบาท |
+| **UAT-C07** | รีวิวสินค้าหลังเดินสถานะออเดอร์จนถึง delivered | **✓** | รีวิวออเดอร์ delivered สำเร็จ, รีวิวซ้ำถูกปฏิเสธ ("คุณรีวิวสินค้านี้ไปแล้ว"), รีวิวออเดอร์ที่ยังไม่ delivered ถูกปฏิเสธ |
+| **Persona: Staff** |  |  |  |
+| **UAT-S01** | ยิง PUT /api/staff/orders/:id/verify-payment | **✓** | เปลี่ยนสถานะ pending_payment → paid สำเร็จ |
+| **UAT-S02** | ยิง PUT .../status ทีละขั้น + ข้ามขั้นโดยตั้งใจ | **✓** | ข้ามขั้น (paid→delivered ตรงๆ) ถูกปฏิเสธ 400, ไม่กรอกเลขพัสดุตอนเปลี่ยน shipped ถูกปฏิเสธ, เดินสถานะปกติครบ + เลขพัสดุถูกบันทึกจริงในฐานข้อมูล |
+| **UAT-S03** | ยิง PUT .../inventory/variants/:id/stock ปรับสต็อกต่ำกว่า threshold | **✓** | ปรับสต็อก variant เดียวสำเร็จไม่กระทบตัวอื่น, ระบบสร้างแจ้งเตือน low_stock จริงในฐานข้อมูล (ยืนยันด้วย query ตรง) |
+| **UAT-S03b** | ยิง POST /api/orders พร้อมกัน 5 request แย่งสต็อกที่เหลือ 2 ชิ้น (คนละบัญชี) | **✓** | สำเร็จเป๊ะ 2 request ที่เหลือถูกปฏิเสธ "มีไม่พอ" สต็อกสุดท้าย = 0 ไม่ติดลบ (แสดงว่า row locking (FOR UPDATE) ทำงานถูกต้อง) |
+| **UAT-S04** | ยิง POST/PUT /api/staff/products สร้าง-แก้ไข-ซ่อนสินค้า | **✓** | สินค้าใหม่ที่ is_visible=true โผล่หน้าร้านทันที, แก้ไข+ซ่อน (is_visible=false) แล้วหายจากหน้าร้านทันที |
+| **Persona: Admin** |  |  |  |
+| **UAT-A01** | ยิง GET /api/admin/dashboard ด้วย token admin/staff/customer/ไม่มี token | **✓** | admin เข้าได้ 200, staff/customer ถูกปฏิเสธ 403, ไม่มี token ถูกปฏิเสธ 401 |
+| **UAT-A02** | ยิง GET /api/admin/dashboard | **✓** | ระบบคำนวณ KPI/กราฟยอดขาย/top products ออกมาได้ถูกต้อง |
+| **UAT-A03** | ยิง GET /api/admin/reports/sales + export | **✓** | ดูตามช่วงเวลาได้, export Excel สำเร็จ (content-type ถูกต้อง) |
+| **UAT-A04** | ยิง GET /api/admin/reports/stock | **✓** | พบสินค้าใกล้หมด 4 รายการ ตรงกับฐานข้อมูล |
+| **UAT-A05** | ยิง GET /api/admin/reports/profit | **✓** | เรียกดูรายงานกำไรสำเร็จ |
+
+**สรุปผลการตรวจสอบ**
+
+| 21 / 21 เคส ตรวจสอบครบทั้งหมด | 20 เคส ผ่านจริง | 1 เคส พบบั๊ก |
+| ----- | :---: | :---: |
+
+# **17\. เอกสาร SLA (Service Level Agreement)**
+
+<img width="1414" height="2000" alt="เอกสาร SLA" src="https://github.com/user-attachments/assets/e162b0ce-5dd0-442f-bd24-f9a045223fce" />
+
+
