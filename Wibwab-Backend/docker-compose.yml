@@ -1,0 +1,39 @@
+# Wibwab (วิบวับ) — ฐานข้อมูล MySQL 8 + phpMyAdmin
+# รันจากโฟลเดอร์ Wibwab-Backend: docker compose up -d
+# รอบแรกที่ volume ยังว่าง MySQL จะรัน schema.sql และ seed.sql ใน ./database ให้อัตโนมัติ
+# (ถ้าอยากล้างฐานข้อมูลแล้วเริ่มใหม่: docker compose down -v แล้ว up ใหม่)
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: wibwab-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: wibwab_root
+      MYSQL_DATABASE: wibwab_db
+      MYSQL_USER: wibwab
+      MYSQL_PASSWORD: wibwab_pass
+    # บังคับ utf8mb4 ทั้งเซิร์ฟเวอร์ — ภาษาไทยต้องรอด (กติกาข้อ 6 ใน PROJECT_STRUCTURE.md)
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: wibwab-phpmyadmin
+    restart: unless-stopped
+    ports:
+      # ใช้ 8081 เพราะพอร์ต 8080 ถูก phpMyAdmin ของโปรเจค Easy-Check ใช้อยู่แล้ว
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:

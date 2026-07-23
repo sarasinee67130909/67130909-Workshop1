@@ -1,0 +1,51 @@
+// components/product/ProductCard.jsx — ชิ้นส่วน UI ฝั่งสินค้า (ยังไม่ implement)
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useFavorites } from '../../context/FavoritesContext';
+
+export default function ProductCard({ product }) {
+  const { isFavorited, toggleFavorite } = useFavorites();
+  const favorited = isFavorited(product.id);
+
+  // ฟอร์แมตราคาเป็นเงินบาท (THB)
+  const formattedPrice = new Intl.NumberFormat('th-TH', {
+    style: 'currency',
+    currency: 'THB',
+    minimumFractionDigits: 0
+  }).format(product.price);
+
+  return (
+    <div className="product-card">
+      <div className="product-card__image-wrap">
+        <img
+          src={product.image_url || '/placeholder-image.jpg'}
+          alt={product.name}
+          className="product-card__image"
+        />
+        {/* ไอคอนหัวใจ (Wishlist) */}
+        <button
+          type="button"
+          className={`product-card__wishlist${favorited ? ' product-card__wishlist--active' : ''}`}
+          aria-label={favorited ? 'นำออกจากรายการโปรด' : 'เพิ่มเข้ารายการโปรด'}
+          onClick={() => toggleFavorite(product)}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+            {favorited ? 'favorite' : 'favorite_border'}
+          </span>
+        </button>
+      </div>
+      
+      <div className="product-card__info">
+        <h3 className="product-card__name">{product.name}</h3>
+        <span className="product-card__price">{formattedPrice}</span>
+        
+        {/* ปุ่มไปหน้าดูรายละเอียดสินค้า */}
+        <Link to={`/products/${product.id}`} style={{ width: '100%' }}>
+          <button className="product-card__button">
+            ดูสินค้า
+          </button>
+        </Link>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,25 @@
+{
+  "name": "wibwab-backend",
+  "version": "1.0.0",
+  "description": "Backend ระบบซื้อขายเครื่องประดับแฟชั่นออนไลน์ วิบวับ (Express + MySQL)",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.1",
+    "mysql2": "^3.11.4",
+    "nodemailer": "^9.0.3",
+    "pdfkit": "^0.19.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

@@ -1,0 +1,130 @@
+/* styles/global.css — reset + ฟอนต์ + ตัวแปรสีกลางของทั้งระบบ (import ครั้งเดียวที่ main.jsx) */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* ── ธีมหลัก (จากดีไซน์ Stitch) ── */
+  --primary: #8a4853;
+  --on-primary: #ffffff;
+  --secondary: #755b00;
+  --on-secondary: #ffffff;
+  --tertiary: #64595a;
+  --error: #ba1a1a;
+  --background: #fff8f7;
+  --on-background: #231919;
+  --surface: #fff8f7;
+  --on-surface: #231919;
+  --surface-variant: #f2dedd;
+  --on-surface-variant: #524345;
+  --outline: #857374;
+  --primary-container: #a6606b;
+  --surface-container-high: #f8e4e3;
+  --outline-variant: #d7c1c3;
+
+  /* ── สีแบรนด์ Wibwab (จากดีไซน์ Stitch) ── */
+  --brand-gold: #c9a227;
+  --cta-gold-dark: #b08d22;
+  --brand-rose: #b76e79;
+  --brand-rose-light: #d6a6ad;
+  --brand-ivory: #faf6f1;
+  --brand-blush: #f3e3e3;
+
+  /* ── ธีมพนักงาน: Teal ── */
+  --staff-teal: #0f766e;
+  --staff-sidebar: #134e4a;
+  --staff-bg: #f6f8f8;
+
+  /* ── ธีมแอดมิน: Slate + ทอง ── */
+  --admin-slate: #1e293b;
+  --admin-gold: #b08d57;
+  --admin-bg: #f8f9fb;
+
+  /* ── ฟอนต์ (โหลดจาก Google Fonts ใน index.html) ── */
+  --font-display: 'Playfair Display', 'Noto Serif Thai', serif;
+  --font-body: 'Montserrat', 'Sarabun', sans-serif;
+
+  /* ── ค่าเก่าสำหรับ backward compatibility (จะค่อยๆ ทยอยลบ) ── */
+  --rose-gold: var(--brand-rose);
+  --rose-gold-dark: var(--primary);
+  --cta-gold: var(--brand-gold);
+  --bg-cream: var(--brand-ivory);
+  --surface-tint: var(--brand-blush);
+  --divider: var(--outline-variant);
+  --text-main: var(--on-background);
+  --text-muted: var(--on-surface-variant);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--on-background);
+  background: var(--surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+ul {
+  list-style: none;
+}
+
+::selection {
+  background: var(--rose-gold);
+  color: #fff;
+}
+
+/* ไอคอน Material Symbols */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  user-select: none;
+}
+
+/* หน้า "อยู่ระหว่างพัฒนา" (catch-all route ใน App.jsx) */
+.wip-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  background: var(--bg-cream);
+}
+
+.wip-page h1 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  color: var(--rose-gold-dark);
+}
+
+.wip-page a {
+  color: var(--rose-gold);
+  font-weight: 600;
+}

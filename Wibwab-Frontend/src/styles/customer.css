@@ -1,0 +1,3155 @@
+/* styles/customer.css — ธีมฝั่งลูกค้า Rose Gold (แปลงจากดีไซน์ Google Stitch ที่เป็น Tailwind) */
+
+.customer-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--surface);
+}
+
+.customer-page main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ═══════════ Navbar ═══════════ */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--surface);
+  border-bottom: 1px solid var(--divider);
+}
+
+.navbar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 88px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.navbar-brand {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 30px;
+  color: var(--rose-gold-dark);
+  transition: opacity 0.3s;
+}
+
+.navbar-brand:hover {
+  opacity: 0.8;
+}
+
+.navbar-links {
+  display: none;
+}
+
+.navbar-link {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.3s;
+}
+
+.navbar-link:hover {
+  color: var(--rose-gold);
+}
+
+.navbar-link.active {
+  color: var(--cta-gold);
+  border-bottom-color: var(--cta-gold);
+}
+
+.navbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--rose-gold-dark);
+}
+
+.navbar-icons a {
+  display: flex;
+  transition: opacity 0.3s, transform 0.1s;
+}
+
+.navbar-icons a:hover {
+  opacity: 0.8;
+}
+
+.navbar-icons a:active {
+  transform: scale(0.95);
+}
+
+/* ปุ่ม hamburger — แสดงเฉพาะจอเล็ก */
+.navbar-menu-btn {
+  display: flex;
+  color: var(--rose-gold-dark);
+}
+
+/* เมนูมือถือ (เปิด/ปิดด้วย state ใน Navbar.jsx) */
+.navbar-mobile {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 20px 20px;
+  background: var(--surface);
+  border-top: 1px solid var(--divider);
+}
+
+.navbar-mobile a {
+  padding: 12px 0;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(215, 193, 195, 0.35);
+}
+
+@media (min-width: 768px) {
+  .navbar-inner {
+    padding: 0 64px;
+    height: 96px;
+  }
+
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .navbar-menu-btn,
+  .navbar-mobile {
+    display: none;
+  }
+}
+
+/* ═══════════ ปุ่ม ═══════════ */
+
+.btn-cta {
+  display: inline-block;
+  background: var(--cta-gold);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 16px 32px;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s;
+}
+
+.btn-cta:hover {
+  background: var(--cta-gold-dark);
+}
+
+.btn-outline {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--rose-gold);
+  color: var(--rose-gold);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 32px;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-outline:hover {
+  background: var(--rose-gold);
+  color: #fff;
+}
+
+/* ═══════════ Hero ═══════════ */
+
+.hero {
+  position: relative;
+  height: 85vh;
+  min-height: 560px;
+  max-height: 820px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-tint);
+}
+
+.hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 42rem;
+  padding: 0 24px;
+}
+
+/* การ์ดกระจกฝ้า (glassmorphism) วางทับรูป hero */
+.glass-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 248, 247, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(215, 193, 195, 0.3);
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rose-gold);
+  margin-bottom: 16px;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 34px;
+  line-height: 1.3;
+  color: var(--text-main);
+  margin-bottom: 24px;
+}
+
+.hero-text {
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 28rem;
+  margin-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+  .glass-card {
+    padding: 48px;
+  }
+
+  .hero-title {
+    font-size: 46px;
+    line-height: 1.2;
+  }
+}
+
+/* ═══════════ Section กลาง ═══════════ */
+
+.section {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 96px 20px;
+}
+
+.section-head {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.section-divider {
+  height: 1px;
+  width: 64px;
+  background: #d6a6ad;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 96px 64px;
+  }
+}
+
+/* ═══════════ Bento grid หมวดหมู่แนะนำ ═══════════ */
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.bento-large {
+  height: 400px;
+}
+
+.bento-side {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 24px;
+}
+
+.bento-side .bento-card {
+  height: 238px;
+}
+
+.bento-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  background: var(--surface-tint);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.bento-card:hover {
+  border-color: var(--divider);
+}
+
+/* รูปพื้นหลังการ์ด + เอฟเฟกต์ซูมตอน hover */
+.bento-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+  opacity: 0.8;
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.bento-card:hover img {
+  transform: scale(1.05);
+}
+
+.bento-card-label {
+  position: relative;
+  z-index: 2;
+}
+
+/* การ์ดใหญ่ใช้ป้ายกระจกฝ้า */
+.bento-large .bento-card-label {
+  align-self: flex-start;
+  padding: 24px;
+  background: rgba(255, 248, 247, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(215, 193, 195, 0.2);
+  border-radius: 4px;
+}
+
+.bento-card h3 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.3;
+  margin-bottom: 8px;
+  transition: color 0.3s;
+}
+
+.bento-card:hover h3 {
+  color: var(--rose-gold);
+}
+
+.bento-card-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rose-gold);
+}
+
+.bento-card-link .material-symbols-outlined {
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  .bento-grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+
+  .bento-large {
+    grid-column: span 7;
+    height: 500px;
+  }
+
+  .bento-side {
+    grid-column: span 5;
+  }
+}
+
+/* ═══════════ Section บริการห่อของขวัญ ═══════════ */
+
+.gift-section {
+  background: var(--bg-cream);
+  border-top: 1px solid rgba(215, 193, 195, 0.3);
+  padding: 96px 0;
+}
+
+.gift-inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: center;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* จอเล็ก: รูปอยู่บน ข้อความอยู่ล่าง (ตามดีไซน์เดิม) */
+.gift-text {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.gift-image {
+  order: 1;
+  height: 420px;
+  background: var(--surface-tint);
+  border-radius: 999px 999px 8px 8px; /* ทรงซุ้มโค้งด้านบน */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.gift-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.gift-image:hover img {
+  transform: scale(1.05);
+}
+
+.gift-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 1.3;
+  margin-bottom: 24px;
+}
+
+.gift-desc {
+  color: var(--text-muted);
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+  .gift-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    padding: 0 64px;
+  }
+
+  .gift-text {
+    order: 1;
+    padding-right: 48px;
+  }
+
+  .gift-image {
+    order: 2;
+    height: 600px;
+  }
+}
+
+/* ═══════════ Footer ═══════════ */
+
+.footer {
+  background: #fff0f0;
+  border-top: 1px solid var(--divider);
+  margin-top: 64px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 64px 20px;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.footer-brand > a {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 30px;
+  color: var(--rose-gold-dark);
+}
+
+.footer-brand p {
+  color: var(--text-muted);
+  max-width: 24rem;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footer-col h4 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.footer-col a {
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.footer-col a:hover {
+  color: var(--rose-gold);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.footer-copy {
+  padding: 0 20px 32px;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+@media (min-width: 768px) {
+  .footer {
+    margin-top: 128px;
+  }
+
+  .footer-grid {
+    grid-template-columns: repeat(4, 1fr);
+    padding: 64px;
+  }
+
+  .footer-brand {
+    grid-column: span 2;
+    padding-right: 48px;
+  }
+}
+
+/* ================= Product List Page Layout ================= */
+.product-page {
+  width: 100%;
+  max-width: 1280px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+.product-page__header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.product-page__title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+.product-page__subtitle {
+  color: var(--text-muted);
+}
+
+.product-page__layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* ================= Filter Sidebar ================= */
+.filter-sidebar {
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid var(--divider);
+}
+
+.filter-sidebar__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--divider);
+  padding-bottom: 12px;
+}
+
+.filter-sidebar__title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.filter-sidebar__clear {
+  font-size: 12px;
+  color: var(--rose-gold);
+  text-decoration: underline;
+}
+
+.filter-group {
+  margin-bottom: 24px;
+}
+
+.filter-group__title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.filter-price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-price-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--divider);
+  border-radius: 4px;
+  font-family: var(--font-body);
+}
+
+.filter-size-select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--divider);
+  border-radius: 4px;
+  font-family: var(--font-body);
+}
+
+/* ================= Product Grid & Card ================= */
+.product-grid__container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.product-grid__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px;
+  color: var(--text-muted);
+}
+
+.product-grid__loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px;
+  font-size: 18px;
+  color: var(--rose-gold);
+}
+
+.product-card {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--divider);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.product-card__image-wrap {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+}
+
+.product-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.product-card:hover .product-card__image {
+  transform: scale(1.05);
+}
+
+.product-card__wishlist {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: color 0.2s;
+}
+
+.product-card__wishlist:hover {
+  color: var(--rose-gold);
+}
+
+.product-card__wishlist--active {
+  color: var(--rose-gold);
+}
+
+.product-card__info {
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.product-card__name {
+  font-size: 16px;
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+}
+
+.product-card__price {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rose-gold);
+  margin-bottom: 16px;
+  margin-top: auto;
+}
+
+.product-card__button {
+  background-color: var(--bg-cream);
+  color: var(--text-main);
+  border: 1px solid var(--divider);
+  padding: 10px;
+  width: 100%;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.product-card:hover .product-card__button {
+  background-color: var(--cta-gold);
+  color: #fff;
+  border-color: var(--cta-gold);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 40px;
+  grid-column: 1 / -1;
+}
+
+.pagination__button {
+  padding: 8px 16px;
+  border: 1px solid var(--divider);
+  background-color: #fff;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.pagination__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination__button:not(:disabled):hover {
+  background-color: var(--bg-cream);
+}
+
+/* ================= Responsive (Media Queries) ================= */
+@media (max-width: 992px) {
+  .product-page__layout {
+    grid-template-columns: 200px 1fr;
+  }
+  .product-grid__container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .product-page__layout {
+    grid-template-columns: 1fr; /* ซ้อน Sidebar ไว้ด้านบน */
+  }
+  .product-grid__container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid__container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Product Detail Page (PDP)
+   ========================================================================== */
+
+.pdp-page-container {
+  background-color: var(--brand-ivory);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdp-main {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 20px;
+}
+
+.pdp-breadcrumb {
+  display: none;
+  margin-bottom: 32px;
+}
+
+.pdp-breadcrumb ol {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--on-surface-variant);
+}
+
+.pdp-breadcrumb a:hover {
+  color: var(--primary);
+  transition: color 0.2s;
+}
+
+.pdp-breadcrumb li[aria-current='page'] {
+  color: var(--on-surface);
+  font-weight: 600;
+}
+
+.pdp-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* ─── Left: Image Gallery ─── */
+.pdp-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pdp-gallery__main-image-wrapper {
+  position: relative;
+  background-color: var(--brand-blush);
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pdp-gallery__main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.pdp-gallery__main-image-wrapper:hover .pdp-gallery__main-image {
+  transform: scale(1.05);
+}
+
+.pdp-gallery__chip {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  padding: 4px 12px;
+  border: 1px solid var(--brand-rose-light);
+  border-radius: 999px;
+  color: var(--brand-rose);
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pdp-gallery__thumbnails {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.pdp-gallery__thumb {
+  aspect-ratio: 1 / 1;
+  background-color: var(--brand-blush);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  border: 1px solid transparent;
+}
+
+.pdp-gallery__thumb:hover {
+  opacity: 0.8;
+  border-color: var(--brand-rose-light);
+}
+
+.pdp-gallery__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+  mix-blend-mode: multiply;
+}
+
+.pdp-gallery__thumb--video {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(214, 166, 173, 0.5);
+}
+
+.pdp-gallery__thumb--video .material-symbols-outlined {
+  font-size: 32px;
+  color: var(--outline);
+}
+
+/* ─── Right: Product Info ─── */
+.pdp-info {
+  display: flex;
+  flex-direction: column;
+  padding-top: 32px;
+}
+
+.pdp-info__collection {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 8px;
+}
+
+.pdp-info__name {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: var(--on-surface);
+  margin-bottom: 16px;
+}
+
+.pdp-info__description {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--on-surface-variant);
+  margin-bottom: 24px;
+}
+
+.pdp-info__price {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--on-surface);
+  margin-bottom: 32px;
+}
+
+.pdp-info__price-currency {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--on-surface-variant);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.pdp-info__divider {
+  border: none;
+  border-top: 1px solid rgba(214, 166, 173, 0.4);
+  margin-bottom: 32px;
+}
+
+.pdp-variants {
+  margin-bottom: 40px;
+}
+
+.pdp-variants__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.pdp-variants__label {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--on-surface);
+}
+
+.pdp-variants__size-guide {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--brand-rose);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s;
+}
+
+.pdp-variants__size-guide:hover {
+  color: var(--brand-rose-light);
+}
+
+.pdp-variants__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.pdp-variants__option {
+  position: relative;
+  cursor: pointer;
+}
+
+.pdp-variants__option input[type='radio'] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.pdp-variants__option-box {
+  padding: 12px 24px;
+  border: 1px solid var(--brand-rose-light);
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.pdp-variants__option input:hover + .pdp-variants__option-box {
+  border-color: var(--brand-gold);
+}
+
+.pdp-variants__option input:checked + .pdp-variants__option-box {
+  background-color: var(--brand-gold);
+  border-color: var(--brand-gold);
+  color: white;
+}
+
+.pdp-variants__option--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pdp-variants__option--disabled .pdp-variants__option-box {
+  border-color: var(--outline-variant);
+  background-color: #f2dedd; /* surface-container-highest */
+  color: var(--outline);
+  position: relative;
+  overflow: hidden;
+}
+
+.pdp-variants__option--disabled .pdp-variants__option-box:hover {
+  border-color: var(--outline-variant);
+}
+
+.pdp-variants__strike-through {
+  position: absolute;
+  inset: 0;
+  border-bottom: 1px solid var(--outline-variant);
+  transform: rotate(-20deg);
+  transform-origin: bottom left;
+}
+
+/* ─── Responsive ─── */
+@media (min-width: 768px) {
+  .pdp-main {
+    padding: 96px 64px;
+  }
+  .pdp-breadcrumb {
+    display: block;
+  }
+  .pdp-gallery__main-image-wrapper {
+    aspect-ratio: 1 / 1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pdp-layout {
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+  }
+  .pdp-gallery {
+    grid-column: span 7;
+  }
+  .pdp-info {
+    grid-column: span 5;
+    padding-left: 48px;
+    padding-top: 0;
+  }
+}
+
+/* ═══════════ PDP: สถานะโหลด / แถบข้อมูลตัวอย่าง ═══════════ */
+
+.pdp-loading,
+.pdp-notfound {
+  min-height: 40vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--on-surface-variant);
+}
+
+.pdp-notfound a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* แถบเตือนว่ากำลังแสดงข้อมูลตัวอย่าง (ลบเมื่อ Backend เสร็จ) */
+.pdp-mock-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.pdp-mock-banner .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* ═══════════ PDP: แกลเลอรี (thumbnail ที่เลือกอยู่) ═══════════ */
+
+.pdp-gallery__thumb--active {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ═══════════ PDP: ชิป variant แบบมีราคา + สถานะสต็อก ═══════════ */
+
+.pdp-variants__option-box--rich {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 20px;
+}
+
+.pdp-variants__option-price {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.pdp-info__price-prefix {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--on-surface-variant);
+  margin-right: 6px;
+}
+
+.pdp-stock {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+.pdp-stock--in {
+  color: #15803d;
+}
+
+.pdp-stock--low {
+  color: #b45309;
+}
+
+.pdp-stock--out {
+  color: var(--error);
+}
+
+.pdp-variants__material {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 6px;
+}
+
+/* ═══════════ PDP: ปุ่มตะกร้า / ข้อมูลจัดส่ง / Accordion / กล่องช่วยเหลือ ═══════════ */
+
+.pdp-add-to-bag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 32px;
+  border: none;
+  cursor: pointer;
+}
+
+.pdp-add-to-bag:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pdp-add-hint {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 8px;
+  text-align: center;
+}
+
+.pdp-favorite-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.pdp-favorite-btn--active {
+  background: var(--rose-gold);
+  color: #fff;
+}
+
+.pdp-shipping-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 16px;
+}
+
+.pdp-shipping-info .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--primary);
+}
+
+.pdp-accordion-group {
+  margin-top: 32px;
+  border-top: 1px solid var(--outline-variant);
+}
+
+.pdp-accordion-item {
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+/* ซ่อน checkbox แล้วใช้ :checked ควบคุมการกาง (ไม่ต้องใช้ JS) */
+.pdp-accordion-toggle {
+  display: none;
+}
+
+.pdp-accordion-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pdp-accordion-icon {
+  color: var(--on-surface-variant);
+  transition: transform 0.3s;
+}
+
+.pdp-accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.pdp-accordion-content-inner {
+  padding: 0 4px 16px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--on-surface-variant);
+}
+
+.pdp-accordion-toggle:checked ~ .pdp-accordion-content {
+  max-height: 400px;
+}
+
+.pdp-accordion-toggle:checked + .pdp-accordion-label .pdp-accordion-icon {
+  transform: rotate(180deg);
+}
+
+.pdp-assistance-box {
+  display: flex;
+  gap: 14px;
+  margin-top: 32px;
+  padding: 20px;
+  background: var(--brand-blush);
+  border-radius: 8px;
+}
+
+.pdp-assistance-box .material-symbols-outlined {
+  color: var(--primary);
+}
+
+.pdp-assistance-box h4 {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.pdp-assistance-box p {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-bottom: 8px;
+}
+
+.pdp-assistance-box a {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ═══════════ PDP: Modal ตารางไซซ์ ═══════════ */
+
+.pdp-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(35, 25, 25, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.pdp-modal {
+  background: var(--surface);
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.pdp-modal__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.pdp-modal__head h3 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+}
+
+.pdp-modal h4 {
+  font-size: 14px;
+  color: var(--primary);
+  margin: 16px 0 8px;
+}
+
+.pdp-modal table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.pdp-modal th,
+.pdp-modal td {
+  border: 1px solid var(--outline-variant);
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.pdp-modal th {
+  background: var(--surface-variant);
+  font-weight: 600;
+}
+
+.pdp-modal__tip {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 16px;
+}
+
+/* ═══════════ PDP: รีวิวจากลูกค้า ═══════════ */
+
+.pdp-reviews {
+  margin-top: 64px;
+  border-top: 1px solid var(--outline-variant);
+  padding-top: 40px;
+}
+
+.pdp-reviews__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pdp-reviews__head h3 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 26px;
+}
+
+.pdp-reviews__avg {
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.pdp-reviews__empty {
+  color: var(--on-surface-variant);
+  padding: 8px 0 24px;
+}
+
+.pdp-review-card {
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background: #fff;
+}
+
+.pdp-review-card__stars {
+  color: var(--secondary);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.pdp-review-card__meta {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 6px;
+}
+
+/* ข้อความยืนยันหลังเพิ่มลงตะกร้า (หน้า ProductDetail) */
+.pdp-added-note {
+  font-size: 14px;
+  color: #15803d;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.pdp-added-note a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ═══════════ Navbar: badge จำนวนสินค้าบนไอคอนตะกร้า ═══════════ */
+
+.navbar-cart {
+  position: relative;
+}
+
+.navbar-cart__badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* สถานะล็อกอินบน Navbar: ชื่อผู้ใช้ (ลิงก์ไปประวัติสั่งซื้อ) + ปุ่มออกจากระบบ */
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navbar-user__name {
+  display: none;
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .navbar-user__name {
+    display: inline;
+  }
+}
+
+.navbar-logout {
+  display: flex;
+  color: var(--rose-gold-dark);
+  cursor: pointer;
+  transition: opacity 0.3s, transform 0.1s;
+}
+
+.navbar-logout:hover {
+  opacity: 0.8;
+  color: var(--error);
+}
+
+.navbar-logout:active {
+  transform: scale(0.95);
+}
+
+.navbar-search {
+  position: relative;
+  display: flex;
+}
+
+.navbar-search > button {
+  display: flex;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--rose-gold-dark);
+  cursor: pointer;
+  transition: opacity 0.3s, transform 0.1s;
+}
+
+.navbar-search > button:hover {
+  opacity: 0.8;
+}
+
+.navbar-search > button:active {
+  transform: scale(0.95);
+}
+
+.navbar-search__form {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: -12px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  z-index: 20;
+}
+
+.navbar-search__form input {
+  width: 220px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.navbar-search__form input:focus {
+  outline: none;
+  border-color: var(--rose-gold);
+}
+
+/* ═══════════ Cart: หน้าตะกร้าสินค้า ═══════════ */
+
+.cart-page {
+  width: 100%;
+  max-width: 1280px;
+  margin: 40px auto;
+  padding: 0 24px;
+  flex: 1;
+}
+
+.cart-page__title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 32px;
+  margin-bottom: 32px;
+}
+
+.cart-page__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .cart-page__layout {
+    grid-template-columns: 1fr 360px;
+  }
+}
+
+.cart-page__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 80px 0;
+  color: var(--on-surface-variant);
+}
+
+.cart-page__empty .material-symbols-outlined {
+  font-size: 64px;
+  color: var(--brand-rose-light);
+}
+
+/* แถวสินค้าในตะกร้า */
+.cart-item {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 16px;
+}
+
+.cart-item__image {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--brand-blush);
+}
+
+.cart-item__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-item__name {
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.cart-item__name:hover {
+  color: var(--primary);
+}
+
+.cart-item__variant,
+.cart-item__unit-price {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: 2px;
+}
+
+/* ปุ่มปรับจำนวน −/+ */
+.cart-item__qty {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.cart-item__qty button {
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+.cart-item__qty button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.cart-item__qty span {
+  min-width: 36px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cart-item__stock-note {
+  font-size: 12px;
+  color: #b45309;
+  margin-top: 6px;
+}
+
+.cart-item__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.cart-item__line-total {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.cart-item__remove {
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.cart-item__remove:hover {
+  color: var(--error);
+}
+
+/* การ์ดสรุปคำสั่งซื้อ */
+.order-summary {
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: #fff;
+  padding: 24px;
+  position: sticky;
+  top: 112px;
+}
+
+.order-summary h3 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.order-summary__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+.order-summary__row--discount {
+  color: #15803d;
+}
+
+.order-summary__row--total {
+  border-top: 1px solid var(--outline-variant);
+  margin-top: 8px;
+  padding-top: 14px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.order-summary__checkout {
+  display: block;
+  text-align: center;
+  width: 100%;
+  margin-top: 16px;
+}
+
+/* กล่องโค้ดส่วนลด */
+.promo-box {
+  margin-bottom: 16px;
+}
+
+.promo-box__row {
+  display: flex;
+  gap: 8px;
+}
+
+.promo-box__row input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.promo-box__apply {
+  padding: 10px 16px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.promo-box__msg {
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.promo-box__msg--ok {
+  color: #15803d;
+}
+
+.promo-box__msg--err {
+  color: var(--error);
+}
+
+.promo-box--applied {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.promo-box--applied .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.promo-box--applied button {
+  margin-left: auto;
+  color: var(--error);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Checkout Page
+   ========================================================================== */
+
+.chk-page-container {
+  background: var(--surface);
+  color: var(--on-surface);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.chk-header {
+  border-bottom: 1px solid var(--outline-variant);
+  text-align: center;
+  padding: 24px 0;
+}
+
+.chk-header__brand {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 30px;
+  color: var(--primary);
+}
+
+.chk-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+.chk-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 900px) {
+  .chk-main {
+    padding: 48px 64px;
+  }
+  .chk-layout {
+    grid-template-columns: 1fr 420px;
+    gap: 48px;
+  }
+  .chk-right-col {
+    order: 2;
+  }
+  .chk-left-col {
+    order: 1;
+  }
+}
+
+/* ─── สไตล์ Input แบบเส้นใต้ ─── */
+.custom-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--outline-variant);
+  padding: 10px 4px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.custom-input:focus {
+  outline: none;
+  border-bottom: 2px solid var(--primary);
+}
+
+.chk-error-msg {
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 4px;
+}
+
+.chk-submit-error {
+  font-size: 14px;
+  text-align: center;
+  margin: 16px 0 0;
+}
+
+/* ─── ส่วนฟอร์มด้านซ้าย ─── */
+.chk-section {
+  margin-bottom: 32px;
+}
+
+.chk-section__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--outline-variant);
+  padding-bottom: 8px;
+}
+
+.chk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.chk-grid__full {
+  grid-column: 1 / -1;
+}
+
+.chk-grid__half {
+  grid-column: span 1;
+}
+
+/* ─── ส่วนห่อของขวัญ ─── */
+.chk-gift-wrap__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.chk-gift-wrap__checkbox input {
+  display: none;
+}
+
+.chk-gift-wrap__message {
+  margin-top: 12px;
+}
+
+.chk-gift-wrap__message label {
+  display: block;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-bottom: 6px;
+}
+
+.chk-gift-wrap__message textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  resize: vertical;
+}
+
+/* ─── ส่วนชำระเงิน ─── */
+.chk-payment-box {
+  background: var(--surface-container-high);
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  padding: 20px;
+  font-size: 14px;
+}
+
+.chk-payment-account {
+  background: #fff;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 12px 0;
+  border-left: 3px solid var(--primary);
+}
+
+.chk-payment-total {
+  font-size: 18px;
+  color: var(--primary);
+}
+
+.chk-payment-divider {
+  border: none;
+  border-top: 1px dashed var(--outline-variant);
+  margin: 16px 0;
+}
+
+.chk-payment-upload-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #fff;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chk-payment-upload-label:hover {
+  background-color: var(--surface-variant);
+}
+
+.chk-payment-upload-input {
+  display: none;
+}
+
+.chk-payment-preview {
+  margin-top: 16px;
+  max-width: 200px;
+  border: 1px solid var(--outline-variant);
+}
+
+/* ─── ปุ่ม Action ท้ายฟอร์ม ─── */
+.chk-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+}
+
+.chk-back-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+
+.chk-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── สรุปรายการด้านขวา ─── */
+.chk-summary {
+  background: var(--surface-container-high);
+  border-radius: 8px;
+  padding: 24px;
+  position: sticky;
+  top: 32px;
+}
+
+.chk-summary__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.chk-summary__items {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-right: -8px;
+}
+
+.chk-summary-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.chk-summary-item:first-child {
+  padding-top: 0;
+}
+
+.chk-summary-item__image {
+  width: 64px;
+  height: 64px;
+  border-radius: 4px;
+  background: #fff;
+  position: relative;
+}
+
+.chk-summary-item__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chk-summary-item__qty {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--primary);
+  color: #fff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chk-summary-item__info {
+  flex: 1;
+}
+
+.chk-summary-item__name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chk-summary-item__variant {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.chk-summary-item__price {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.chk-summary__promo {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.chk-summary__totals {
+  padding-top: 20px;
+}
+
+.chk-summary__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.chk-summary__row--discount {
+  color: #15803d;
+}
+
+.chk-summary__row--final {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+/* ==========================================================================
+   Order History Page (ohp-*)
+   ========================================================================== */
+
+.ohp-main {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+.ohp-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.ohp-header h1 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.ohp-header p {
+  color: var(--on-surface-variant);
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  .ohp-main {
+    padding: 48px 64px;
+  }
+  .ohp-header {
+    text-align: left;
+  }
+}
+
+/* ─── Filter Tabs ─── */
+.ohp-filter-tabs {
+  margin-bottom: 24px;
+  overflow-x: auto;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.ohp-filter-tabs::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.ohp-filter-tabs__inner {
+  display: flex;
+  gap: 16px;
+  min-width: max-content;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.ohp-filter-tab {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 12px;
+  color: var(--on-surface-variant);
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s;
+  margin-bottom: -1px; /* ให้เส้นขอบล่างทับเส้นของ container */
+}
+
+.ohp-filter-tab:hover {
+  color: var(--primary);
+}
+
+.ohp-filter-tab--active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* ─── Order List & Card ─── */
+.ohp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ohp-card {
+  background: var(--surface-container-high);
+  border-radius: 12px;
+  border: 1px solid var(--outline-variant);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.ohp-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(138, 72, 83, 0.08);
+}
+
+.ohp-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(215, 193, 195, 0.5);
+}
+
+.ohp-card__date {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.ohp-card__id {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ohp-card__body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ohp-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.5);
+  border-top: 1px solid rgba(215, 193, 195, 0.5);
+}
+
+.ohp-card__total {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.ohp-card__actions {
+  display: flex;
+  gap: 12px;
+}
+
+.ohp-card__actions .btn-cta,
+.ohp-card__actions .btn-outline {
+  flex-grow: 1;
+  padding: 10px 16px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.ohp-btn--cancel {
+  border-color: var(--outline);
+  color: var(--on-surface-variant);
+}
+.ohp-btn--cancel:hover {
+  background: var(--error);
+  border-color: var(--error);
+  color: #fff;
+}
+
+@media (min-width: 768px) {
+  .ohp-card__header,
+  .ohp-card__footer {
+    flex-direction: row;
+    align-items: center;
+  }
+  .ohp-card__actions .btn-cta,
+  .ohp-card__actions .btn-outline {
+    flex-grow: 0;
+  }
+}
+
+/* ─── Status Badge ─── */
+.ohp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.ohp-status .material-symbols-outlined {
+  font-size: 16px;
+}
+.ohp-status--orange { background: #fff7ed; color: #9a3412; }
+.ohp-status--blue { background: #eff6ff; color: #1e40af; }
+.ohp-status--purple { background: #f5f3ff; color: #5b21b6; }
+.ohp-status--indigo { background: #eef2ff; color: #3730a3; }
+.ohp-status--green { background: #f0fdf4; color: #15803d; }
+.ohp-status--gray { background: #f1f5f9; color: #475569; }
+
+/* ─── Order Item Row ─── */
+.ohp-item {
+  display: flex;
+  gap: 16px;
+}
+.ohp-item__image {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: #fff;
+}
+.ohp-item__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ohp-item__info { flex: 1; }
+.ohp-item__name { font-weight: 600; font-size: 15px; }
+.ohp-item__variant, .ohp-item__price { font-size: 13px; color: var(--on-surface-variant); }
+.ohp-item__gift { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--primary); margin-top: 4px; }
+.ohp-item__gift .material-symbols-outlined { font-size: 16px; }
+.ohp-item__actions { text-align: right; }
+.ohp-item__actions .btn-outline { padding: 6px 12px; font-size: 12px; }
+.ohp-item__reviewed { font-size: 13px; color: #15803d; font-weight: 500; }
+.ohp-tracking-info { background: #fff; padding: 8px 12px; border-radius: 4px; font-size: 14px; margin-top: 8px; }
+
+/* ─── Empty State ─── */
+.ohp-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 20px;
+  background: var(--surface-container-high);
+  border-radius: 12px;
+}
+.ohp-empty-state .material-symbols-outlined {
+  font-size: 64px;
+  color: var(--outline);
+}
+.ohp-empty-state h3 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  margin: 12px 0 8px;
+}
+.ohp-empty-state p {
+  color: var(--on-surface-variant);
+  max-width: 400px;
+  margin-bottom: 24px;
+}
+
+/* ─── Review Modal ─── */
+.ohp-review-modal {
+  padding: 0; /* Override pdp-modal padding */
+}
+.ohp-review-modal form {
+  display: flex;
+  flex-direction: column;
+}
+.ohp-review-modal .pdp-modal__head {
+  padding: 16px 24px;
+}
+.ohp-review-modal__item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+}
+.ohp-review-modal__image {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  background: var(--brand-blush);
+}
+.ohp-review-modal__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ohp-review-modal__item h4 { font-size: 15px; font-weight: 600; margin: 0; }
+.ohp-review-modal__item p { font-size: 13px; color: var(--on-surface-variant); margin: 0; }
+
+.ohp-review-modal__rating {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 24px;
+}
+.ohp-review-modal__rating .material-symbols-outlined {
+  font-size: 36px;
+  cursor: pointer;
+  color: var(--outline-variant);
+  transition: color 0.2s;
+}
+.ohp-review-modal__rating:hover .material-symbols-outlined { color: var(--brand-gold); }
+.ohp-review-modal__rating .material-symbols-outlined:hover ~ .material-symbols-outlined { color: var(--outline-variant); }
+
+.ohp-review-modal__comment {
+  padding: 0 24px 24px;
+}
+.ohp-review-modal__comment textarea {
+  width: 100%;
+  border: 1px solid var(--outline-variant);
+  border-radius: 6px;
+  padding: 12px;
+  font-family: var(--font-body);
+  resize: vertical;
+}
+.ohp-review-modal__footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--outline-variant);
+  background: var(--surface-container-high);
+}
+.ohp-review-modal__footer .btn-cta {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Login Page (login-*)
+   ========================================================================== */
+
+.login-page-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--surface);
+}
+
+/* ─── แผงรูปภาพฝั่งซ้าย (แสดงเฉพาะจอใหญ่) ─── */
+.login-image-panel {
+  display: none; /* ซ่อนเป็น default */
+  position: relative;
+  background-color: var(--surface-variant);
+}
+
+.login-image-panel img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ─── แผงฟอร์มฝั่งขวา ─── */
+.login-form-panel {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-form-wrapper {
+  width: 100%;
+  max-width: 28rem; /* 448px */
+}
+
+.login-header {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.login-title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.login-subtitle {
+  font-size: 16px;
+  color: var(--on-surface-variant);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.login-input-group {
+  position: relative;
+}
+
+.login-input-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  margin-bottom: 4px;
+}
+
+/* Input แบบเส้นใต้ (แปลงจาก @apply) */
+.minimal-input {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--primary-container);
+  padding: 8px 0;
+  color: var(--on-surface);
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.minimal-input:focus {
+  outline: none;
+  border-bottom-color: var(--secondary);
+}
+
+.minimal-input::placeholder {
+  color: var(--on-surface-variant);
+  opacity: 0.5;
+}
+
+.login-password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-password-toggle {
+  position: absolute;
+  right: 0;
+  color: var(--on-surface-variant);
+  transition: color 0.2s;
+}
+
+.login-password-toggle:hover {
+  color: var(--primary);
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.login-remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.login-options a {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.login-submit-btn {
+  width: 100%;
+  background-color: var(--secondary);
+  color: var(--on-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 16px 24px;
+  transition: opacity 0.2s;
+}
+
+.login-submit-btn:hover {
+  opacity: 0.9;
+}
+
+.login-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-error-msg {
+  color: var(--error);
+  font-size: 14px;
+  text-align: center;
+  margin-top: -16px;
+}
+
+/* ลิงก์พาไปหน้า login พนักงาน (แสดงเมื่อ staff/admin มา login ผิดประตู) */
+.login-staff-link {
+  text-align: center;
+  margin-top: -8px;
+  font-size: 14px;
+}
+
+.login-staff-link a {
+  color: var(--staff-teal);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.login-register-link {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+
+.login-register-link a {
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Responsive: จอใหญ่ (768px ขึ้นไป) */
+@media (min-width: 768px) {
+  .login-image-panel {
+    display: block;
+    width: 50%;
+  }
+  .login-form-panel {
+    width: 50%;
+  }
+  .login-header {
+    text-align: left;
+  }
+}
+
+/* ==========================================================================
+   Register Page (register-*)
+   ========================================================================== */
+
+/* ใช้ layout, form-wrapper, header, input-group, password-wrapper, error-msg, register-link
+   ร่วมกับหน้า Login (login-*) เพื่อความสอดคล้อง */
+
+.register-submit-btn {
+  width: 100%;
+  background-color: var(--brand-rose); /* สีปุ่มตาม spec */
+  color: var(--on-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 16px 24px;
+  transition: background-color 0.3s, opacity 0.2s;
+}
+
+.register-submit-btn:hover {
+  background-color: var(--primary); /* hover สีเข้มขึ้น */
+}
+
+.register-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--brand-rose); /* สีตอน disabled ไม่ต้องเปลี่ยน */
+}
+
+.register-terms {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.register-terms label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.register-terms a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  margin: 0 4px;
+}
+
+/* สไตล์สำหรับ field ที่มี error */
+.register-field--error label {
+  color: var(--error);
+}
+.register-field--error .minimal-input {
+  border-bottom-color: var(--error);
+}
+.register-field__error-msg {
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 4px;
+}
+
+/* แต่ง <select> ให้เหมือน <input> */
+.register-select-wrapper {
+  position: relative;
+}
+.register-select-wrapper::after {
+  content: 'expand_more';
+  font-family: 'Material Symbols Outlined';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--on-surface-variant);
+}
+.register-select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 24px; /* กันที่ให้ลูกศร */
+}
+
+/* ==========================================================================
+   Profile Page (My Account)
+   ========================================================================== */
+
+.profile-main {
+  width: 100%;
+  max-width: 1280px;
+  margin: 40px auto;
+  padding: 0 24px;
+  flex: 1;
+}
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .profile-layout {
+    grid-template-columns: 280px 1fr;
+  }
+}
+
+/* ─── Sidebar ─── */
+.profile-sidebar {
+  position: sticky;
+  top: 112px; /* Navbar height + margin */
+}
+
+.profile-user-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  background: var(--surface-container-high);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.profile-user-card__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--brand-blush);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.profile-user-card__avatar .material-symbols-outlined {
+  font-size: 40px;
+  color: var(--primary);
+}
+
+.profile-user-card__name {
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+
+.profile-user-card__email {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  word-break: break-all;
+}
+
+.profile-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-nav__link {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  color: var(--on-surface-variant);
+  transition: background-color 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+.profile-nav__link:hover {
+  background-color: var(--surface-variant);
+  color: var(--on-surface);
+}
+
+.profile-nav__link--active {
+  background-color: var(--brand-blush);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.profile-nav__link--logout {
+  margin-top: 8px;
+  border-top: 1px solid var(--outline-variant);
+}
+.profile-nav__link--logout:hover {
+  color: var(--error);
+}
+
+/* ─── Content Cards ─── */
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.profile-card {
+  background: #fff;
+  border: 1px solid var(--outline-variant);
+  border-radius: 12px;
+  scroll-margin-top: 112px; /* For anchor links */
+}
+
+.profile-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.profile-card__header h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+
+.profile-card__body {
+  padding: 24px;
+}
+
+.profile-card__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--outline-variant);
+  background: var(--surface-container-high);
+}
+
+.profile-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.profile-success-msg {
+  font-size: 14px;
+  color: #15803d;
+  margin-right: auto;
+}
+
+/* Profile Info Card */
+.profile-avatar-uploader {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 24px;
+}
+.profile-avatar-uploader label { cursor: pointer; }
+.profile-avatar-uploader img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.profile-avatar-uploader__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.profile-avatar-uploader:hover .profile-avatar-uploader__overlay { opacity: 1; }
+
+.profile-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+@media (min-width: 500px) {
+  .profile-fields { grid-template-columns: 1fr 1fr; }
+  .profile-fields .login-input-group:first-child { grid-column: 1 / -1; }
+}
+
+.profile-readonly-field { position: relative; }
+.profile-readonly-field input { color: var(--on-surface-variant); }
+.profile-readonly-field .material-symbols-outlined {
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  font-size: 18px;
+  color: var(--outline);
+}
+
+/* Address Card */
+.profile-address-list { display: flex; flex-direction: column; gap: 16px; }
+.profile-address-item {
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  padding: 16px;
+  position: relative;
+}
+.profile-address-item p { font-size: 14px; line-height: 1.6; }
+.profile-address-item__default-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--brand-blush);
+  color: var(--primary);
+}
+.profile-address-item__actions { margin-top: 12px; display: flex; gap: 16px; }
+.profile-address-item__actions button { font-size: 13px; font-weight: 600; color: var(--primary); }
+
+/* Change Password Card */
+.profile-pw-strength { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.profile-pw-strength__bar { display: flex; gap: 3px; flex: 1; }
+.profile-pw-strength__bar div { height: 4px; flex: 1; background: var(--surface-variant); border-radius: 2px; transition: background-color 0.3s; }
+.profile-pw-strength__bar[data-score='1'] div:nth-child(1) { background: #ef4444; }
+.profile-pw-strength__bar[data-score='2'] div:nth-child(-n+2) { background: #f97316; }
+.profile-pw-strength__bar[data-score='3'] div:nth-child(-n+3) { background: #eab308; }
+.profile-pw-strength__bar[data-score='4'] div:nth-child(-n+4) { background: #84cc16; }
+.profile-pw-strength__bar[data-score='5'] div:nth-child(-n+5) { background: #22c55e; }
+.profile-pw-strength__label { font-size: 12px; color: var(--on-surface-variant); }
+/* แถวเลือกไซซ์ 2 ช่องคู่กัน (แหวน + กำไล) ตามดีไซน์ */
+.register-size-hint {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin: 4px 0 12px;
+}
+
+.register-size-row {
+  display: flex;
+  gap: 16px;
+}
+
+.register-size-col {
+  width: 50%;
+}
+
+.register-size-col label {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  margin-bottom: 4px;
+}
+
+/* ==========================================================================
+   Forgot / Reset Password Pages
+   ========================================================================== */
+
+/* ─── Floating Label Input (Forgot Password Page) ─── */
+.fp-field {
+  position: relative;
+}
+
+.fp-label {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  font-size: 16px;
+  color: var(--on-surface-variant);
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.fp-input {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--primary-container);
+  padding: 8px 0;
+  color: var(--on-surface);
+  font-size: 16px;
+}
+
+/* เมื่อ focus หรือมีข้อความอยู่ (placeholder ไม่แสดง) ให้ label ลอยขึ้น */
+.fp-input:focus + .fp-label,
+.fp-input:not(:placeholder-shown) + .fp-label {
+  top: -16px;
+  font-size: 12px;
+  color: var(--primary);
+}
+
+.fp-input:focus {
+  outline: none;
+  border-bottom-color: var(--secondary);
+}
+
+/* ─── "Sent" state UI ─── */
+.fp-sent-state {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fp-sent-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--brand-blush);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.fp-sent-icon .material-symbols-outlined {
+  font-size: 36px;
+}
+
+/* ─── Success Panel (Reset Password Page) ─── */
+.fp-success-panel {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 400px;
+}
